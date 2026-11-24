@@ -288,7 +288,7 @@ const Game = {
     velocity: new THREE.Vector3(),
     onGround: true, isCrouching: false, isSprinting: false,
     level: 1, exp: 0, expToNext: 100, skillPoints: 0, coins: 0,
-    weapons: ['p92'], equippedWeapon: 'p92',
+    weapons: ['b9_sidearm'], equippedWeapon: 'b9_sidearm',
     inventory: [], stamina: 100
   },
   monsters: [], items: [], walls: [], lights: [],
@@ -315,7 +315,12 @@ const CONFIG = {
     { name: "Habitable Zone", desc: "混凝土仓库。冷光灯下，每个角落都可能藏着东西。", wallColor: 0x888888, floorColor: 0x555555, ceilColor: 0x666666, fogColor: 0x1a1a1a, ambientIntensity: 0.28, lightColor: 0xffffff, monsterTypes: ['stalker','hound'], roomCount: 18 },
     { name: "Pipe Dreams", desc: "管道隧道错综复杂，应急灯勉强照亮前方几米。", wallColor: 0x6b3a1a, floorColor: 0x3a2010, ceilColor: 0x4a2818, fogColor: 0x1a0a05, ambientIntensity: 0.18, lightColor: 0xff6644, monsterTypes: ['skinstealer','stalker'], roomCount: 22 },
     { name: "Electrical Station", desc: "电气机房。火花四溅，不自然的笑声在远处回荡。", wallColor: 0x2a4a6a, floorColor: 0x1a2a3a, ceilColor: 0x223348, fogColor: 0x05101a, ambientIntensity: 0.22, lightColor: 0x44aaff, monsterTypes: ['partygoer','skinstealer'], roomCount: 20 },
-    { name: "Run For Your Life", desc: "跑。不要回头。不要停下。", wallColor: 0x4a0000, floorColor: 0x2a0000, ceilColor: 0x3a0000, fogColor: 0x1a0000, ambientIntensity: 0.12, lightColor: 0xff0000, monsterTypes: ['hound','stalker','smiler','skinstealer','partygoer'], roomCount: 1, isChase: true }
+    { name: "Run For Your Life", desc: "跑。不要回头。不要停下。", wallColor: 0x4a0000, floorColor: 0x2a0000, ceilColor: 0x3a0000, fogColor: 0x1a0000, ambientIntensity: 0.12, lightColor: 0xff0000, monsterTypes: ['hound','stalker','smiler','skinstealer','partygoer'], roomCount: 1, isChase: true },
+    { name: "The Poolrooms", desc: "无尽的水上迷宫。瓷砖反射着冷光，水面下似乎有什么在游动。", wallColor: 0x4a8a8a, floorColor: 0x2a6a6a, ceilColor: 0x3a7a7a, fogColor: 0x0a2a2a, ambientIntensity: 0.3, lightColor: 0xaaffff, monsterTypes: ['smiler','skinstealer'], roomCount: 16 },
+    { name: "Thermal Halls", desc: "炽热的走廊。蒸汽从管道中喷涌，温度让人难以呼吸。", wallColor: 0x8a4a2a, floorColor: 0x5a2a1a, ceilColor: 0x6a3a2a, fogColor: 0x2a0a05, ambientIntensity: 0.2, lightColor: 0xff8844, monsterTypes: ['hound','partygoer'], roomCount: 19 },
+    { name: "The Abandoned Mall", desc: "废弃商场。扶梯早已停转，橱窗后的假人似乎在看着你。", wallColor: 0x6a6a7a, floorColor: 0x4a4a5a, ceilColor: 0x5a5a6a, fogColor: 0x1a1a2a, ambientIntensity: 0.25, lightColor: 0xddddff, monsterTypes: ['stalker','smiler','partygoer'], roomCount: 24 },
+    { name: "The Hive", desc: "活体组织构成的墙壁。某种巨大生物的巢穴。心跳声无处不在。", wallColor: 0x7a2a3a, floorColor: 0x4a1a2a, ceilColor: 0x5a2a3a, fogColor: 0x1a050a, ambientIntensity: 0.15, lightColor: 0xff4466, monsterTypes: ['skinstealer','hound','stalker'], roomCount: 21 },
+    { name: "The Threshold", desc: "后室的核心。现实与虚空的交界。SBM所说的'真相'就在前方。", wallColor: 0x2a2a4a, floorColor: 0x1a1a2a, ceilColor: 0x2a2a3a, fogColor: 0x05050a, ambientIntensity: 0.1, lightColor: 0xaaaaff, monsterTypes: ['hound','stalker','smiler','skinstealer','partygoer'], roomCount: 1, isChase: true, isFinal: true }
   ]
 };
 
@@ -1056,18 +1061,18 @@ const PlayerController = {
 
 // ---------- WEAPONS ----------
 const WEAPONS = {
-  knife: { id:'knife', name:'小刀', type:'melee', damage:30, fireRate:120, magazine:0, reserveAmmo:0, range:2.5, recoilVertical:0, recoilHorizontal:0, spread:0, auto:false, adsZoom:1, pellets:1, reloadTime:0, price:0, unlocked:true },
-  p92: { id:'p92', name:'P92', type:'pg', damage:18, fireRate:400, magazine:15, reserveAmmo:30, range:50, recoilVertical:1.5, recoilHorizontal:0.5, spread:2, auto:false, adsZoom:1.3, pellets:1, reloadTime:1.5, price:0, unlocked:true },
-  p18c: { id:'p18c', name:'P18C', type:'pg', damage:12, fireRate:800, magazine:17, reserveAmmo:34, range:40, recoilVertical:1.2, recoilHorizontal:0.8, spread:2.5, auto:true, adsZoom:1.2, pellets:1, reloadTime:1.3, price:200, unlocked:false },
-  ump45: { id:'ump45', name:'UMP45', type:'smg', damage:22, fireRate:550, magazine:25, reserveAmmo:75, range:60, recoilVertical:1.8, recoilHorizontal:0.6, spread:3, auto:true, adsZoom:1.4, pellets:1, reloadTime:2.2, price:400, unlocked:false },
-  vector: { id:'vector', name:'Vector', type:'smg', damage:16, fireRate:1100, magazine:19, reserveAmmo:57, range:50, recoilVertical:0.8, recoilHorizontal:0.3, spread:2.5, auto:true, adsZoom:1.4, pellets:1, reloadTime:2.0, price:600, unlocked:false },
-  m416: { id:'m416', name:'M416', type:'ar', damage:28, fireRate:700, magazine:30, reserveAmmo:90, range:120, recoilVertical:2.0, recoilHorizontal:0.8, spread:1.5, auto:true, adsZoom:1.6, pellets:1, reloadTime:2.3, price:800, unlocked:false },
-  akm: { id:'akm', name:'AKM', type:'ar', damage:35, fireRate:600, magazine:30, reserveAmmo:90, range:100, recoilVertical:3.0, recoilHorizontal:1.5, spread:2, auto:true, adsZoom:1.5, pellets:1, reloadTime:2.5, price:700, unlocked:false },
-  scar_l: { id:'scar_l', name:'SCAR-L', type:'ar', damage:26, fireRate:620, magazine:30, reserveAmmo:90, range:110, recoilVertical:1.5, recoilHorizontal:0.4, spread:1.2, auto:true, adsZoom:1.6, pellets:1, reloadTime:2.3, price:900, unlocked:false },
-  s12k: { id:'s12k', name:'S12K', type:'sg', damage:18, fireRate:300, magazine:5, reserveAmmo:20, range:25, recoilVertical:4, recoilHorizontal:2, spread:5, auto:false, adsZoom:1.2, pellets:6, reloadTime:3.0, price:500, unlocked:false },
-  s686: { id:'s686', name:'S686', type:'sg', damage:22, fireRate:150, magazine:2, reserveAmmo:12, range:20, recoilVertical:5, recoilHorizontal:2, spread:6, auto:false, adsZoom:1.1, pellets:9, reloadTime:2.5, price:450, unlocked:false },
-  kar98k: { id:'kar98k', name:'Kar98k', type:'sr', damage:75, fireRate:1500, magazine:5, reserveAmmo:15, range:250, recoilVertical:6, recoilHorizontal:1, spread:0.5, auto:false, adsZoom:3.0, pellets:1, reloadTime:2.8, price:1000, unlocked:false },
-  awm: { id:'awm', name:'AWM', type:'sr', damage:120, fireRate:1800, magazine:5, reserveAmmo:10, range:300, recoilVertical:8, recoilHorizontal:1.5, spread:0.3, auto:false, adsZoom:4.0, pellets:1, reloadTime:3.5, price:1500, unlocked:false }
+  knife: { id:'knife', name:'SBM制式匕首', type:'melee', damage:30, fireRate:120, magazine:0, reserveAmmo:0, range:2.5, recoilVertical:0, recoilHorizontal:0, spread:0, auto:false, adsZoom:1, pellets:1, reloadTime:0, price:0, unlocked:true },
+  b9_sidearm: { id:'b9_sidearm', name:'B9Sidearm 战术手枪', type:'pg', damage:18, fireRate:400, magazine:15, reserveAmmo:30, range:50, recoilVertical:1.5, recoilHorizontal:0.5, spread:2, auto:false, adsZoom:1.3, pellets:1, reloadTime:1.5, price:0, unlocked:true },
+  g17_auto: { id:'g17_auto', name:'G17Auto 全自动手枪', type:'pg', damage:12, fireRate:800, magazine:17, reserveAmmo:34, range:40, recoilVertical:1.2, recoilHorizontal:0.8, spread:2.5, auto:true, adsZoom:1.2, pellets:1, reloadTime:1.3, price:200, unlocked:false },
+  smg_vanguard: { id:'smg_vanguard', name:'Vanguard SMG', type:'smg', damage:22, fireRate:550, magazine:25, reserveAmmo:75, range:60, recoilVertical:1.8, recoilHorizontal:0.6, spread:3, auto:true, adsZoom:1.4, pellets:1, reloadTime:2.2, price:400, unlocked:false },
+  smg_tempest: { id:'smg_tempest', name:'Tempest 冲锋枪', type:'smg', damage:16, fireRate:1100, magazine:19, reserveAmmo:57, range:50, recoilVertical:0.8, recoilHorizontal:0.3, spread:2.5, auto:true, adsZoom:1.4, pellets:1, reloadTime:2.0, price:600, unlocked:false },
+  ar_sentinel: { id:'ar_sentinel', name:'Sentinel 步枪', type:'ar', damage:28, fireRate:700, magazine:30, reserveAmmo:90, range:120, recoilVertical:2.0, recoilHorizontal:0.8, spread:1.5, auto:true, adsZoom:1.6, pellets:1, reloadTime:2.3, price:800, unlocked:false },
+  ar_ravager: { id:'ar_ravager', name:'Ravager 突击步枪', type:'ar', damage:35, fireRate:600, magazine:30, reserveAmmo:90, range:100, recoilVertical:3.0, recoilHorizontal:1.5, spread:2, auto:true, adsZoom:1.5, pellets:1, reloadTime:2.5, price:700, unlocked:false },
+  ar_phantom: { id:'ar_phantom', name:'Phantom 精准步枪', type:'ar', damage:26, fireRate:620, magazine:30, reserveAmmo:90, range:110, recoilVertical:1.5, recoilHorizontal:0.4, spread:1.2, auto:true, adsZoom:1.6, pellets:1, reloadTime:2.3, price:900, unlocked:false },
+  sg_brute: { id:'sg_brute', name:'Brute 半自动霰弹枪', type:'sg', damage:18, fireRate:300, magazine:5, reserveAmmo:20, range:25, recoilVertical:4, recoilHorizontal:2, spread:5, auto:false, adsZoom:1.2, pellets:6, reloadTime:3.0, price:500, unlocked:false },
+  sg_titan: { id:'sg_titan', name:'Titan 双管霰弹枪', type:'sg', damage:22, fireRate:150, magazine:2, reserveAmmo:12, range:20, recoilVertical:5, recoilHorizontal:2, spread:6, auto:false, adsZoom:1.1, pellets:9, reloadTime:2.5, price:450, unlocked:false },
+  sr_longbow: { id:'sr_longbow', name:'Longbow 栓动狙击枪', type:'sr', damage:75, fireRate:1500, magazine:5, reserveAmmo:15, range:250, recoilVertical:6, recoilHorizontal:1, spread:0.5, auto:false, adsZoom:3.0, pellets:1, reloadTime:2.8, price:1000, unlocked:false },
+  sr_eclipse: { id:'sr_eclipse', name:'Eclipse 反器材狙击', type:'sr', damage:120, fireRate:1800, magazine:5, reserveAmmo:10, range:300, recoilVertical:8, recoilHorizontal:1.5, spread:0.3, auto:false, adsZoom:4.0, pellets:1, reloadTime:3.5, price:1500, unlocked:false }
 };
 
 // ---------- WEAPON CONTROLLER ----------
@@ -2937,9 +2942,9 @@ function startGame() {
   Game.extractTimer = 0;
   
   // Give starting weapon
-  Game.player.weapons = ['p92', 'knife'];
-  Game.player.equippedWeapon = 'p92';
-  weaponController.switchWeapon('p92');
+  Game.player.weapons = ['b9_sidearm', 'knife'];
+  Game.player.equippedWeapon = 'b9_sidearm';
+  weaponController.switchWeapon('b9_sidearm');
   
   // Default skills
   skillSystem.activeSkills = ['dash', 'heal', 'smoke'];
@@ -3133,7 +3138,7 @@ function generateLoot(rarity) {
   for (let i = 0; i < rolls; i++) {
     let roll = Math.random();
     if (roll < 0.3) {
-      let weapons = ['m416', 'akm', 'scar_l', 'ump45', 'vector', 's12k', 's686', 'kar98k', 'awm'];
+      let weapons = ['ar_sentinel', 'ar_ravager', 'ar_phantom', 'smg_vanguard', 'smg_tempest', 'sg_brute', 'sg_titan', 'sr_longbow', 'sr_eclipse'];
       let wid = weapons[Math.floor(Math.random() * weapons.length)];
       loot.push({type: 'weapon', id: wid, name: WEAPONS[wid] ? WEAPONS[wid].name : wid});
     } else if (roll < 0.5) {
@@ -3223,7 +3228,7 @@ function completeExtract() {
 }
 
 function nextLevel() {
-  if (Game.currentLevel < 4) {
+  if (Game.currentLevel < CONFIG.levels.length - 1) {
     Game.killCount = 0;
     Game.lootValue = 0;
     loadLevel(Game.currentLevel + 1);
@@ -3341,8 +3346,8 @@ function update(delta) {
   // Update UI
   uiSystem.updateHUD();
   
-  // Check level 4 chase logic
-  if (Game.currentLevel === 4 && Game.state === 'playing') {
+  // Check chase level logic
+  if (CONFIG.levels[Game.currentLevel] && CONFIG.levels[Game.currentLevel].isChase && Game.state === 'playing') {
     // Continuous monster spawning in chase level
     Game.chaseTimer = (Game.chaseTimer || 0) + delta;
     if (Game.chaseTimer > 3) {
@@ -3385,7 +3390,7 @@ function loadSave() {
       Game.player.level = save.level || 1;
       Game.player.exp = save.exp || 0;
       Game.player.coins = save.coins || 0;
-      Game.player.weapons = save.weapons || ['p92', 'knife'];
+      Game.player.weapons = save.weapons || ['b9_sidearm', 'knife'];
       Game.player.skillPoints = save.skillPoints || 0;
       rpgSystem.skillTree = save.skillTree || {};
       return true;
@@ -3394,10 +3399,489 @@ function loadSave() {
   return false;
 }
 
+// ===== PART 4: SBM WORLD BUILDING & EASTER EGG SYSTEM =====
+
+// ---------- SBM LORE SYSTEM ----------
+const SBM_LORE = {
+  // SBM = "Survival Branch Matrix" 生存矩阵分局
+  factionName: "SBM 生存矩阵分局",
+  factionDesc: "SBM（Survival Branch Matrix）是一支跨维度生存组织，专门研究和应对后室现象。",
+
+  // 主线剧情
+  storyChapters: [
+    {
+      level: 0,
+      title: "第一章：坠落",
+      intro: "你从现实的裂缝中坠落，醒来时已身处黄色壁纸的无尽房间。一个耳塞里的声音告诉你：'欢迎加入SBM。你现在是我们的外勤探员了。'",
+      outro: "你找到了第一个撤离点。SBM指挥官K的声音响起：'干得不错，探员。但这只是开始。后室有十一层已确认区域，真相在最深处。'"
+    },
+    {
+      level: 1,
+      title: "第二章：信号",
+      intro: "K告诉你，SBM在Level 1发现了一种异常信号源。它似乎在召唤什么东西……或者什么东西在召唤它。",
+      outro: "你在管道入口前发现了第一具SBM探员的遗体。他的录音器还在运作：'……它们在学习……它们在模仿……不要相信——'"
+    },
+    {
+      level: 2,
+      title: "第三章：模仿者",
+      intro: "皮囊窃取者的出现证实了录音中的警告。它们能模仿人类外形，甚至模仿声音。K开始怀疑SBM内部已被渗透。",
+      outro: "你从电气站的入口看到了一行血字：'SBM不是你以为的SBM。去找Dr.陈。她知道真相。'"
+    },
+    {
+      level: 3,
+      title: "第四章：裂痕",
+      intro: "Dr.陈曾是SBM首席研究员。她发现了后室并非自然现象——它是被制造的。一个被称为'编排者'的存在设计了这一切。",
+      outro: "追逐战结束后，K的通讯中断了。一个陌生声音取代了他：'你比之前的探员都走得远。但你还不够了解这场游戏。继续往下，如果你敢。'"
+    },
+    {
+      level: 4,
+      title: "第五章：深渊",
+      intro: "Poolrooms。水中倒映的不是你的脸，而是无数个'你'在不同后室中挣扎的画面。每一次倒影都在做着不同的选择。",
+      outro: "你在瓷砖上发现了一串数字：7-3-3-1。SBM终端显示这是一个坐标——指向更深层。"
+    },
+    {
+      level: 5,
+      title: "第六章：灼烧",
+      intro: "Thermal Halls的高温让设备频繁故障。你发现了一些被烧毁的SBM档案残页，上面提到'编排者'可能是前SBM探员编号#0000。",
+      outro: "在商场的废墟中，你找到了Dr.陈的全息日志：'编排者不是怪物。他是第一个进入后室的人。他变成了后室本身。'"
+    },
+    {
+      level: 6,
+      title: "第七章：假面",
+      intro: "废弃商场的假人在你经过时转头。K的声音恢复了，但他的用词开始变得奇怪——像是在背诵剧本。你怀疑眼前的K已经不是真正的K。",
+      outro: "在Hive的入口，你遇到了一个自称是真正K的全息投影。他警告你：'上面的K是编排者的傀儡。真正的SBM早已不在。'"
+    },
+    {
+      level: 7,
+      title: "第八章：巢穴",
+      intro: "The Hive是活的。墙壁在呼吸，地面在脉搏。编排者用这些有机物质'生长'出新的后室楼层。",
+      outro: "你在巢穴核心找到了编排者的日记：'我曾是探员#0000。我发现了后室的尽头——那里什么都没有。于是我创造了新的楼层，让后室永恒扩张。我是这座监狱的狱卒，也是囚犯。'"
+    },
+    {
+      level: 8,
+      title: "第九章：真相",
+      intro: "Dr.陈的最终日志揭示了一切：后室是编排者用自身意识构建的维度牢笼。SBM是他留下的求救信号——他在等待有人能到达核心，终结他。",
+      outro: "Threshold就在前方。编排者的声音响彻整个后室：'来吧，探员。让我们结束这一切。'"
+    },
+    {
+      level: 9,
+      title: "终章：门槛",
+      intro: "现实与虚空的交界。编排者——曾经的探员#0000——以巨大的扭曲人形出现在走廊尽头。他不攻击你，只是注视。",
+      outro: "你做出了选择。后室的真相，由你亲手书写。"
+    }
+  ],
+
+  // SBM 终端日志（散落在各层）
+  terminalLogs: [
+    { id: 'log_001', level: 0, title: 'SBM新探员手册', text: '欢迎加入SBM生存矩阵分局。你的耳塞内置通讯器已激活。记住三条规则：1. 不要在黑暗中停留。2. 不要信任会说话的东西。3. 撤离永远比战利品重要。' },
+    { id: 'log_002', level: 1, title: '勘测报告 #001', text: 'Level 1的物资密度是Level 0的3倍。但失踪探员数量也是3倍。建议提高警惕。——SBM后勤部' },
+    { id: 'log_003', level: 2, title: '研究笔记：皮囊窃取者', text: '它们能完美模仿战利品箱的外形。唯一区别：伪装的箱子在靠近时会有微弱的呼吸声。用火焰可以有效克制。——Dr.陈' },
+    { id: 'log_004', level: 3, title: '紧急通讯', text: '所有探员注意。编排者不是传说。我在Level 3的电气系统中发现了人为编码的信号模式。后室是被设计的。——Dr.陈（加密频道）' },
+    { id: 'log_005', level: 5, title: '探员#0000档案', text: '姓名：[已删除]。入职日期：SBM成立日。失踪日期：SBM成立后第7天。备注：第一个进入后室的人。最后通讯记录：「我看到了尽头。我需要让它继续。」' },
+    { id: 'log_006', level: 7, title: '编排者日记·最终页', text: '后室的尽头是虚无。我用自己的意识填补了虚无，创造了更多楼层。SBM是我留下的求救信。我在等待一个足够强的人到达核心，杀死我——因为后室不会让我自杀。如果你读到这段话，请继续前进。' },
+    { id: 'log_007', level: 9, title: 'Dr.陈的最后录音', text: '编排者在等待终结。但他不会让你轻易做到。Threshold是他最后的防线，也是他最后的请求。杀了他，后室会崩塌。但如果你选择放过他……后室会永远存在，而你会成为新的编排者。选择权在你。' }
+  ],
+
+  // SBM NPC 对话
+  npcDialogues: {
+    commander_k: {
+      name: '指挥官K',
+      dialogues: [
+        '探员，你的耳塞工作正常吗？后室里一切声音都可能是陷阱。',
+        'SBM在这片区域损失了太多人。别成为下一个。',
+        '我曾在Level 3失去过一整支小队。后来我发现……那不是怪物杀的。',
+        '有时候我也怀疑自己是不是真正的K。后室会改变人。',
+        '继续深入，探员。真相在等着你。不管那是什么。'
+      ]
+    },
+    dr_chen: {
+      name: 'Dr.陈',
+      dialogues: [
+        '后室不是自然现象。你明白吗？它是被建造的。',
+        '编排者……他曾经和我们一样。一个探员。第一个探员。',
+        '我在Level 7找到了他的日记。他在请求有人能终结他。',
+        'SBM不是来拯救你的。SBM是编排者留下的求救信号。',
+        '最后的抉择只有你能做。没有人能替你承担。'
+      ]
+    },
+    the_orchestrator: {
+      name: '编排者',
+      dialogues: [
+        '……你比我预想的走得远。',
+        '你以为SBM是在帮你？SBM是我写的。每一行代码。',
+        '我曾经也想逃出去。后来我发现——没有外面。后室就是全部。',
+        '如果你杀死我，这一切都会消失。包括你自己。',
+        '如果你放过我……你会成为我。你会理解为什么我需要有人来终结这一切。',
+        '做选择吧，探员。我已经等了太久太久。'
+      ]
+    }
+  },
+
+  // SBM 安全屋终端交互
+  getTerminalLog(level) {
+    const logs = this.terminalLogs.filter(l => l.level === level);
+    if (logs.length === 0) return null;
+    return logs[Math.floor(Math.random() * logs.length)];
+  },
+
+  // 剧情触发
+  triggerStoryEvent(level) {
+    const chapter = this.storyChapters.find(c => c.level === level);
+    if (!chapter) return;
+    uiSystem.showMessage(chapter.title, 4000, '#fd0');
+    setTimeout(() => {
+      uiSystem.showMessage(chapter.intro, 6000, '#aaa');
+    }, 2000);
+  },
+
+  triggerOutro(level) {
+    const chapter = this.storyChapters.find(c => c.level === level);
+    if (!chapter) return;
+    uiSystem.showMessage(chapter.outro, 6000, '#fd0');
+  }
+};
+
+// ---------- EASTER EGG SYSTEM (GTA6-Level) ----------
+const EasterEggs = {
+  found: new Set(),
+  
+  eggs: {
+    // 1. 经典"The Backrooms"原图引用
+    original_image: {
+      name: '最初的图像',
+      desc: '在Level 0某个房间的角落，黄色壁纸下藏着一张泛黄的照片。上面写着："第一次 noclip 的纪念。"',
+      hint: '仔细检查Level 0最角落的房间',
+      reward: { coins: 50, exp: 20 },
+      trigger: 'inspect_wall_level0'
+    },
+    
+    // 2. SBM创始人密室
+    sbm_vault: {
+      name: 'SBM零号金库',
+      desc: '使用密码7331可以打开Level 5 Poolrooms的隐藏金库。里面有SBM最初成立时的完整档案。',
+      hint: '7-3-3-1。Dr.陈在Level 4留下了这个数字。',
+      reward: { coins: 500, exp: 200, item: 'relic' },
+      trigger: 'code_7331'
+    },
+    
+    // 3. 编排者的留声机
+    orchestrator_phonograph: {
+      name: '编排者的留声机',
+      desc: '在Level 6 Thermal Halls的蒸汽管道后面，有一台仍在旋转的老式留声机。播放的是一首从未公开发布过的钢琴曲——编排者变成现在这副模样前最后录制的音乐。',
+      hint: '听。在蒸汽的嘶嘶声下面，有旋律。',
+      reward: { coins: 100, exp: 50 },
+      trigger: 'inspect_steam_pipes'
+    },
+    
+    // 4. 开发者房间
+    dev_room: {
+      name: '开发者密室',
+      desc: '一面看似普通的墙后面是一个纯白房间。墙上用黑色马克笔写着：「如果你能看到这行字，说明你比我们预期的更会翻墙。——AK Backroom Dev Team」。地上有一把金色武器。',
+      hint: '有些墙是可以穿过的。尤其是在Level 2的管道区域。',
+      reward: { coins: 300, exp: 100, weapon: 'sr_eclipse' },
+      trigger: 'noclip_wall_level2'
+    },
+    
+    // 5. 意义不明的UFO
+    ufo_sighting: {
+      name: '那不是飞机',
+      desc: '在Level 5 Poolrooms的天花板上方，透过一个裂缝，可以看到一片诡异的星空。一个碟形物体缓慢飘过。它没有任何交互意义。它就在那里。',
+      hint: '抬头。有时候答案在天上。',
+      reward: { coins: 50, exp: 30 },
+      trigger: 'look_up_level5'
+    },
+    
+    // 6. 无限走廊
+    infinite_corridor: {
+      name: '走不到的尽头',
+      desc: '在Level 7 Hive的某个有机通道中，如果你一直向前走超过60秒不回头，走廊会开始重复。每走一步，墙壁上的有机组织会变得越来越像人脸。第100步时，所有人脸会同时睁开眼看向你。然后一切恢复正常。',
+      hint: '不要回头。一直走。数你的脚步。',
+      reward: { coins: 200, exp: 150 },
+      trigger: 'walk_forward_100_steps'
+    },
+    
+    // 7. 派对客的生日蛋糕
+    party_cake: {
+      name: '生日快乐',
+      desc: '如果你在Level 3对一只派对客使用"信号枪"而不是杀死它，它会在原地放下一块蛋糕然后消失。蛋糕可以食用，恢复全部SAN值。',
+      hint: '不是所有怪物都需要杀死。有时候派对需要的是光。',
+      reward: { coins: 0, exp: 100, sanRestore: 100 },
+      trigger: 'signal_gun_partygoer'
+    },
+    
+    // 8. 编排者的棋盘
+    chess_board: {
+      name: '编排者的棋局',
+      desc: 'Level 8 Threshold入口前有一个石制棋盘。棋子是后室怪物的微缩模型。如果你把"跟踪者"棋子移到"国王"位置，棋盘会说：「将军。你比编排者更擅长这个。」',
+      hint: '在最后的门槛前，停下来想想。这是一盘棋。',
+      reward: { coins: 100, exp: 100 },
+      trigger: 'chess_stalker_to_king'
+    },
+    
+    // 9. 耳塞里的幽灵信号
+    ghost_signal: {
+      name: '137.500MHz',
+      desc: '在任意楼层的安全屋中，静止不动60秒。你的耳塞会收到一段无法解析的信号。信号解码后是：「如果你能听到这条消息，说明编排者还没有赢。不要相信K。不要相信陈。只相信你的枪。——探员#0042」',
+      hint: '在安全屋中。不要动。不要说话。等。',
+      reward: { coins: 100, exp: 80 },
+      trigger: 'idle_in_safehouse_60s'
+    },
+    
+    // 10. 多重结局触发
+    true_ending: {
+      name: '第三选择',
+      desc: '在最终BOSS战时，编排者会给你两个选择：杀死他或放过他。但如果你的背包中有"圣物"且SAN值满，会出现第三个选项：将圣物交给编排者。他会用它终结自己，同时保住后室不崩塌——你成为了新的SBM指挥官。',
+      hint: '完美的精神状态+最神圣的遗物=超越二元的选择。',
+      reward: { coins: 1000, exp: 500 },
+      trigger: 'final_choice_with_relic'
+    },
+    
+    // 11. 数字彩蛋——后室编号
+    backroom_number: {
+      name: 'Level Fun =)',
+      desc: '在Level 3派对客区域，如果你在派对客面前做"下蹲-起立-下蹲-起立-跳跃"动作（模拟派对舞蹈），所有派对客会停止攻击并开始围着你的位置转圈，持续10秒。然后它们会鼓掌（用触手拍击地面）并赠送你一个特殊道具。',
+      hint: '派对客喜欢派对。你也是派对的一部分。',
+      reward: { coins: 150, exp: 100, item: 'radio' },
+      trigger: 'dance_for_partygoers'
+    },
+    
+    // 12. 开发者留言墙
+    dev_messages: {
+      name: '墙后的低语',
+      desc: '在Level 9 Threshold的最终走廊墙壁上，用紫外线灯（手电筒+特定角度）照射可以看到隐藏文字：「感谢你玩到这里。这不仅仅是一个游戏。这是我们对后室文化的致敬，对每一个noclip者的祝福。无论你在哪个现实，愿你找到你的出口。——Dev Team 2026」',
+      hint: '最终的道路上，光照的角度很重要。',
+      reward: { coins: 200, exp: 100 },
+      trigger: 'flashlight_final_corridor'
+    }
+  },
+
+  // 触发彩蛋
+  trigger(eggId) {
+    if (this.found.has(eggId)) {
+      uiSystem.showMessage('（这个秘密你已经发现过了）', 2000, '#666');
+      return false;
+    }
+    const egg = this.eggs[eggId];
+    if (!egg) return false;
+    
+    this.found.add(eggId);
+    uiSystem.showMessage('【彩蛋发现】' + egg.name, 5000, '#fd0');
+    setTimeout(() => {
+      uiSystem.showMessage(egg.desc, 8000, '#aaa');
+    }, 1500);
+    
+    // 发放奖励
+    if (egg.reward) {
+      if (egg.reward.coins) Game.player.coins += egg.reward.coins;
+      if (egg.reward.exp) rpgSystem.addExp(egg.reward.exp);
+      if (egg.reward.item) itemSystem.pickupItem(egg.reward.item);
+      if (egg.reward.weapon && !Game.player.weapons.includes(egg.reward.weapon)) {
+        Game.player.weapons.push(egg.reward.weapon);
+      }
+      if (egg.reward.sanRestore) PlayerController.addSan(egg.reward.sanRestore);
+    }
+    
+    // 播放发现音效
+    AudioSystem.playLevelUp();
+    
+    // 检查全彩蛋成就
+    if (this.found.size === Object.keys(this.eggs).length) {
+      setTimeout(() => {
+        uiSystem.showMessage('【成就解锁】后室考古学家 - 发现全部隐藏秘密', 6000, '#0f0');
+        Game.player.coins += 1000;
+        rpgSystem.addExp(500);
+      }, 3000);
+    }
+    
+    return true;
+  },
+
+  // 获取发现进度
+  getProgress() {
+    return { found: this.found.size, total: Object.keys(this.eggs).length };
+  },
+
+  // 检查特定条件触发
+  checkTriggers(context) {
+    // context = { action, level, position, ... }
+    switch(context.action) {
+      case 'inspect_wall':
+        if (context.level === 0 && context.position.x < -20) {
+          this.trigger('original_image');
+        }
+        break;
+      case 'enter_code':
+        if (context.code === '7331' && context.level === 5) {
+          this.trigger('sbm_vault');
+        }
+        break;
+      case 'inspect_steam':
+        if (context.level === 6) {
+          this.trigger('orchestrator_phonograph');
+        }
+        break;
+      case 'noclip_wall':
+        if (context.level === 2) {
+          this.trigger('dev_room');
+        }
+        break;
+      case 'look_up':
+        if (context.level === 5) {
+          this.trigger('ufo_sighting');
+        }
+        break;
+      case 'walk_far':
+        if (context.level === 7 && context.distance > 60) {
+          this.trigger('infinite_corridor');
+        }
+        break;
+      case 'signal_gun_monster':
+        if (context.monsterType === 'partygoer') {
+          this.trigger('party_cake');
+          return true; // 消耗事件
+        }
+        break;
+      case 'idle_safehouse':
+        this.trigger('ghost_signal');
+        break;
+      case 'chess_move':
+        if (context.piece === 'stalker' && context.position === 'king') {
+          this.trigger('chess_board');
+        }
+        break;
+      case 'dance':
+        if (context.level === 3) {
+          this.trigger('backroom_number');
+        }
+        break;
+      case 'flashlight_angle':
+        if (context.level === 9) {
+          this.trigger('dev_messages');
+        }
+        break;
+    }
+    return false;
+  }
+};
+
+// ---------- SBM TERMINAL UI ----------
+const SBMTerminal = {
+  isOpen: false,
+  
+  open(logId) {
+    const log = SBM_LORE.terminalLogs.find(l => l.id === logId);
+    if (!log) return;
+    
+    // 创建终端界面
+    let overlay = document.getElementById('sbmTerminal');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'sbmTerminal';
+      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:100;display:flex;align-items:center;justify-content:center;font-family:monospace';
+      document.body.appendChild(overlay);
+    }
+    
+    overlay.innerHTML = `
+      <div style="max-width:600px;width:90%;background:#0a1a0a;border:2px solid #0f0;border-radius:8px;padding:30px;box-shadow:0 0 30px rgba(0,255,0,0.3)">
+        <div style="color:#0f0;font-size:14px;margin-bottom:5px;opacity:0.7">SBM生存矩阵分局 // 加密终端</div>
+        <div style="color:#0f0;font-size:20px;margin-bottom:15px;border-bottom:1px solid #0f0;padding-bottom:10px">${log.title}</div>
+        <div style="color:#8f8;font-size:14px;line-height:1.8;margin-bottom:20px;white-space:pre-wrap">${log.text}</div>
+        <div style="color:#0f0;font-size:12px;opacity:0.5;margin-bottom:15px">[Level ${log.level}] [加密等级: ${log.level + 1}] [状态: 已解密]</div>
+        <button class="menuBtn" onclick="document.getElementById('sbmTerminal').style.display='none';document.getElementById('gameCanvas').requestPointerLock()" style="width:100%">关闭终端 [ESC]</button>
+      </div>
+    `;
+    overlay.style.display = 'flex';
+    this.isOpen = true;
+    document.exitPointerLock();
+    
+    // ESC 关闭
+    const escHandler = (e) => {
+      if (e.key === 'Escape') {
+        overlay.style.display = 'none';
+        document.removeEventListener('keydown', escHandler);
+        this.isOpen = false;
+        if (Game.state === 'playing') document.getElementById('gameCanvas').requestPointerLock();
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+  }
+};
+
+// ---------- LORE TRIGGERS IN GAME ----------
+// 修改 loadLevel 函数加入剧情触发
+const _originalLoadLevel = loadLevel;
+loadLevel = function(levelIndex) {
+  _originalLoadLevel(levelIndex);
+  // 触发该层剧情
+  setTimeout(() => {
+    SBM_LORE.triggerStoryEvent(levelIndex);
+  }, 1000);
+};
+
+// 修改 completeExtract 加入剧情outro
+const _originalCompleteExtract = completeExtract;
+completeExtract = function() {
+  _originalCompleteExtract();
+  SBM_LORE.triggerOutro(Game.currentLevel);
+};
+
+// 闲置检测（彩蛋：安全屋闲置60秒）
+let _idleTimer = 0;
+let _lastPlayerPos = { x: 0, z: 0 };
+const _originalUpdate = update;
+update = function(delta) {
+  _originalUpdate(delta);
+  
+  // 彩蛋：闲置检测
+  if (Game.state === 'playing') {
+    const dx = Game.player.position.x - _lastPlayerPos.x;
+    const dz = Game.player.position.z - _lastPlayerPos.z;
+    const moved = Math.sqrt(dx*dx + dz*dz);
+    
+    if (moved < 0.1 && Game.player.inSafeHouse) {
+      _idleTimer += delta;
+      if (_idleTimer > 60) {
+        EasterEggs.checkTriggers({ action: 'idle_safehouse' });
+        _idleTimer = 0;
+      }
+    } else {
+      _idleTimer = 0;
+    }
+    _lastPlayerPos.x = Game.player.position.x;
+    _lastPlayerPos.z = Game.player.position.z;
+    
+    // 彩蛋：Level 5 向上看
+    if (Game.currentLevel === 5) {
+      const lookUp = Game.camera.rotation.x < -1.3; // 向上看超过75度
+      if (lookUp) {
+        EasterEggs.checkTriggers({ action: 'look_up', level: 5 });
+      }
+    }
+    
+    // 彩蛋：Level 7 长距离行走
+    if (Game.currentLevel === 7) {
+      if (!Game._walkDist) Game._walkDist = 0;
+      if (moved > 0.1) {
+        Game._walkDist += moved;
+        if (Game._walkDist > 60) {
+          EasterEggs.checkTriggers({ action: 'walk_far', level: 7, distance: Game._walkDist });
+        }
+      }
+    }
+    
+    // 彩蛋：Level 3 蹲起跳跃检测
+    if (Game.currentLevel === 3) {
+      if (!Game._danceSeq) Game._danceSeq = [];
+      // 在PlayerController中已经处理了蹲起，这里检测序列
+    }
+  }
+};
+
 // Start
 window.addEventListener('load', () => {
   initGame();
 });
+
 
 </script>
 
