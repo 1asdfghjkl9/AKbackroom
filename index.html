@@ -275,6 +275,13 @@ canvas{display:block}
 <div id="jumpscare"><canvas id="jumpscareCanvas" width="800" height="600"></canvas></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/OutputPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
 <script>
 // ===== GAME STATE =====
 const Game = {
@@ -324,9 +331,11 @@ const CONFIG = {
   ]
 };
 
-// ---------- TEXTURE FACTORY ----------
+// ---------- TEXTURE FACTORY (PBR Enhanced) ----------
 const TextureFactory = {
   _canvas: null,
+  _normalCanvas: null,
+  _roughCanvas: null,
   _ctx: null,
   _getCanvas(size) {
     if (!this._canvas) { this._canvas = document.createElement('canvas'); }
@@ -334,65 +343,170 @@ const TextureFactory = {
     if (!this._ctx) this._ctx = this._canvas.getContext('2d');
     return this._canvas;
   },
-  _toTexture() {
+  _toTexture(encoding) {
     const tex = new THREE.CanvasTexture(this._canvas);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    if (encoding !== undefined) tex.encoding = encoding;
+    else tex.encoding = THREE.sRGBEncoding;
+    tex.anisotropy = 8;
+    return tex;
+  },
+  _generateNormalMap(baseCtx, size) {
+    if (!this._normalCanvas) this._normalCanvas = document.createElement('canvas');
+    this._normalCanvas.width = size; this._normalCanvas.height = size;
+    const nctx = this._normalCanvas.getContext('2d');
+    const src = baseCtx.getImageData(0, 0, size, size);
+    const dst = nctx.createImageData(size, size);
+    // Simple sobel-based normal map from heightmap
+    for (let y = 1; y < size - 1; y++) {
+      for (let x = 1; x < size - 1; x++) {
+        const i = (y * size + x) * 4;
+        const il = (y * size + (x-1)) * 4;
+        const ir = (y * size + (x+1)) * 4;
+        const iu = ((y-1) * size + x) * 4;
+        const id = ((y+1) * size + x) * 4;
+        const hL = (src.data[il] + src.data[il+1] + src.data[il+2]) / 3;
+        const hR = (src.data[ir] + src.data[ir+1] + src.data[ir+2]) / 3;
+        const hU = (src.data[iu] + src.data[iu+1] + src.data[iu+2]) / 3;
+        const hD = (src.data[id] + src.data[id+1] + src.data[id+2]) / 3;
+        const dx = (hL - hR) / 255 * 2;
+        const dy = (hU - hD) / 255 * 2;
+        const dz = 1;
+        const len = Math.sqrt(dx*dx + dy*dy + dz*dz);
+        dst.data[i] = (dx / len * 0.5 + 0.5) * 255;
+        dst.data[i+1] = (dy / len * 0.5 + 0.5) * 255;
+        dst.data[i+2] = (dz / len * 0.5 + 0.5) * 255;
+        dst.data[i+3] = 255;
+      }
+    }
+    nctx.putImageData(dst, 0, 0);
+    const tex = new THREE.CanvasTexture(this._normalCanvas);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    return tex;
+  },
+  _generateRoughnessMap(baseCtx, size, baseRoughness) {
+    if (!this._roughCanvas) this._roughCanvas = document.createElement('canvas');
+    this._roughCanvas.width = size; this._roughCanvas.height = size;
+    const rctx = this._roughCanvas.getContext('2d');
+    const src = baseCtx.getImageData(0, 0, size, size);
+    const dst = rctx.createImageData(size, size);
+    for (let i = 0; i < src.data.length; i += 4) {
+      const lum = (src.data[i] + src.data[i+1] + src.data[i+2]) / 3;
+      // Darker areas = rougher, lighter = smoother
+      const r = Math.max(0, Math.min(255, baseRoughness * 255 + (lum - 128) * 0.3));
+      dst.data[i] = dst.data[i+1] = dst.data[i+2] = r;
+      dst.data[i+3] = 255;
+    }
+    rctx.putImageData(dst, 0, 0);
+    const tex = new THREE.CanvasTexture(this._roughCanvas);
     tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
     return tex;
   },
   wallTexture(baseColor) {
-    const c = this._getCanvas(256); const ctx = this._ctx;
+    const size = 512;
+    const c = this._getCanvas(size); const ctx = this._ctx;
     const hex = '#' + baseColor.toString(16).padStart(6, '0');
-    ctx.fillStyle = hex; ctx.fillRect(0, 0, 256, 256);
-    // noise
-    for (let i = 0; i < 2000; i++) {
-      const x = Math.random() * 256, y = Math.random() * 256;
-      const v = (Math.random() - 0.5) * 40;
+    ctx.fillStyle = hex; ctx.fillRect(0, 0, size, size);
+    // High-detail noise
+    for (let i = 0; i < 6000; i++) {
+      const x = Math.random() * size, y = Math.random() * size;
+      const v = (Math.random() - 0.5) * 50;
       const r = parseInt(hex.substr(1,2),16)+v, g = parseInt(hex.substr(3,2),16)+v, b = parseInt(hex.substr(5,2),16)+v;
       ctx.fillStyle = `rgb(${Math.max(0,Math.min(255,r))},${Math.max(0,Math.min(255,g))},${Math.max(0,Math.min(255,b))})`;
-      ctx.fillRect(x, y, 2, 2);
+      ctx.fillRect(x, y, 3, 3);
     }
-    // stains
-    for (let i = 0; i < 8; i++) {
-      const x = Math.random()*256, y = Math.random()*256, r = 10+Math.random()*30;
+    // Realistic stains
+    for (let i = 0; i < 15; i++) {
+      const x = Math.random()*size, y = Math.random()*size, r = 15+Math.random()*50;
       const grad = ctx.createRadialGradient(x,y,0,x,y,r);
-      grad.addColorStop(0, 'rgba(40,30,10,0.4)');
-      grad.addColorStop(1, 'rgba(40,30,10,0)');
+      grad.addColorStop(0, 'rgba(30,20,5,0.5)');
+      grad.addColorStop(0.5, 'rgba(30,20,5,0.2)');
+      grad.addColorStop(1, 'rgba(30,20,5,0)');
       ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
     }
-    // wallpaper pattern lines
-    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
-    for (let y = 0; y < 256; y += 32) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(256,y); ctx.stroke(); }
-    const tex = this._toTexture(); tex.repeat.set(2, 1); return tex;
+    // Cracks
+    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 8; i++) {
+      ctx.beginPath();
+      let x = Math.random()*size, y = Math.random()*size;
+      ctx.moveTo(x, y);
+      for (let j = 0; j < 5; j++) {
+        x += (Math.random()-0.5)*60; y += (Math.random()-0.5)*60;
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    // Wallpaper pattern lines
+    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+    for (let y = 0; y < size; y += 64) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(size,y); ctx.stroke(); }
+    // Generate PBR maps
+    const normalTex = this._generateNormalMap(ctx, size);
+    const roughTex = this._generateRoughnessMap(ctx, size, 0.8);
+    const tex = this._toTexture(); tex.repeat.set(2, 1);
+    tex.userData = { normalMap: normalTex, roughnessMap: roughTex, repeat: [2, 1] };
+    normalTex.repeat.set(2, 1); roughTex.repeat.set(2, 1);
+    return tex;
   },
   floorTexture(baseColor) {
-    const c = this._getCanvas(256); const ctx = this._ctx;
+    const size = 512;
+    const c = this._getCanvas(size); const ctx = this._ctx;
     const hex = '#' + baseColor.toString(16).padStart(6, '0');
-    ctx.fillStyle = hex; ctx.fillRect(0,0,256,256);
-    for (let i = 0; i < 1500; i++) {
-      const x = Math.random()*256, y = Math.random()*256, v = (Math.random()-0.5)*30;
+    ctx.fillStyle = hex; ctx.fillRect(0,0,size,size);
+    for (let i = 0; i < 4000; i++) {
+      const x = Math.random()*size, y = Math.random()*size, v = (Math.random()-0.5)*40;
       const r = parseInt(hex.substr(1,2),16)+v, g = parseInt(hex.substr(3,2),16)+v, b = parseInt(hex.substr(5,2),16)+v;
       ctx.fillStyle = `rgb(${Math.max(0,Math.min(255,r))},${Math.max(0,Math.min(255,g))},${Math.max(0,Math.min(255,b))})`;
-      ctx.fillRect(x,y,2,2);
+      ctx.fillRect(x,y,3,3);
     }
-    // grid tiles
-    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
-    for (let i = 0; i <= 256; i += 64) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,256); ctx.moveTo(0,i); ctx.lineTo(256,i); ctx.stroke(); }
-    const tex = this._toTexture(); tex.repeat.set(3,3); return tex;
+    // Grid tiles with depth
+    ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i <= size; i += 128) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,size); ctx.moveTo(0,i); ctx.lineTo(size,i); ctx.stroke(); }
+    // Tile highlights
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 1;
+    for (let i = 2; i <= size; i += 128) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,size); ctx.moveTo(0,i); ctx.lineTo(size,i); ctx.stroke(); }
+    // Wear marks
+    for (let i = 0; i < 10; i++) {
+      const x = Math.random()*size, y = Math.random()*size, r = 5+Math.random()*15;
+      const grad = ctx.createRadialGradient(x,y,0,x,y,r);
+      grad.addColorStop(0, 'rgba(0,0,0,0.3)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+    }
+    const normalTex = this._generateNormalMap(ctx, size);
+    const roughTex = this._generateRoughnessMap(ctx, size, 0.7);
+    const tex = this._toTexture(); tex.repeat.set(3,3);
+    normalTex.repeat.set(3,3); roughTex.repeat.set(3,3);
+    tex.userData = { normalMap: normalTex, roughnessMap: roughTex };
+    return tex;
   },
   ceilingTexture(baseColor) {
-    const c = this._getCanvas(256); const ctx = this._ctx;
+    const size = 512;
+    const c = this._getCanvas(size); const ctx = this._ctx;
     const hex = '#' + baseColor.toString(16).padStart(6, '0');
-    ctx.fillStyle = hex; ctx.fillRect(0,0,256,256);
-    for (let i = 0; i < 1000; i++) {
-      const x = Math.random()*256, y = Math.random()*256, v = (Math.random()-0.5)*20;
+    ctx.fillStyle = hex; ctx.fillRect(0,0,size,size);
+    for (let i = 0; i < 3000; i++) {
+      const x = Math.random()*size, y = Math.random()*size, v = (Math.random()-0.5)*30;
       const r = parseInt(hex.substr(1,2),16)+v, g = parseInt(hex.substr(3,2),16)+v, b = parseInt(hex.substr(5,2),16)+v;
       ctx.fillStyle = `rgb(${Math.max(0,Math.min(255,r))},${Math.max(0,Math.min(255,g))},${Math.max(0,Math.min(255,b))})`;
-      ctx.fillRect(x,y,2,2);
+      ctx.fillRect(x,y,3,3);
     }
-    // ceiling panels
-    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-    for (let i = 0; i <= 256; i += 128) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,256); ctx.moveTo(0,i); ctx.lineTo(256,i); ctx.stroke(); }
-    const tex = this._toTexture(); tex.repeat.set(2,2); return tex;
+    // Ceiling panels with bevel effect
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i <= size; i += 256) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,size); ctx.moveTo(0,i); ctx.lineTo(size,i); ctx.stroke(); }
+    // Panel inner highlights
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+    ctx.lineWidth = 1;
+    for (let i = 3; i <= size; i += 256) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,size); ctx.moveTo(0,i); ctx.lineTo(size,i); ctx.stroke(); }
+    const normalTex = this._generateNormalMap(ctx, size);
+    const roughTex = this._generateRoughnessMap(ctx, size, 0.9);
+    const tex = this._toTexture(); tex.repeat.set(2,2);
+    normalTex.repeat.set(2,2); roughTex.repeat.set(2,2);
+    tex.userData = { normalMap: normalTex, roughnessMap: roughTex };
+    return tex;
   },
   metalTexture() {
     const c = this._getCanvas(128); const ctx = this._ctx;
@@ -745,17 +859,34 @@ const SceneBuilder = {
     // Fog
     Game.scene.fog = new THREE.FogExp2(cfg.fogColor, CONFIG.fogDensity);
     Game.scene.background = new THREE.Color(cfg.fogColor);
-    // Ambient light
-    const ambient = new THREE.AmbientLight(cfg.lightColor, cfg.ambientIntensity);
+    // Hemisphere + Ambient lighting for natural fill
+    const hemi = new THREE.HemisphereLight(cfg.lightColor, cfg.floorColor, cfg.ambientIntensity * 0.6);
+    Game.scene.add(hemi);
+    const ambient = new THREE.AmbientLight(cfg.lightColor, cfg.ambientIntensity * 0.4);
     Game.scene.add(ambient);
 
-    // Shared materials
+    // Shared PBR materials
     const wallTex = TextureFactory.wallTexture(cfg.wallColor);
     const floorTex = TextureFactory.floorTexture(cfg.floorColor);
     const ceilTex = TextureFactory.ceilingTexture(cfg.ceilColor);
-    const matWall = new THREE.MeshLambertMaterial({ map: wallTex });
-    const matFloor = new THREE.MeshLambertMaterial({ map: floorTex });
-    const matCeil = new THREE.MeshLambertMaterial({ map: ceilTex });
+    const matWall = new THREE.MeshStandardMaterial({
+      map: wallTex,
+      normalMap: wallTex.userData ? wallTex.userData.normalMap : null,
+      roughnessMap: wallTex.userData ? wallTex.userData.roughnessMap : null,
+      roughness: 0.85, metalness: 0.05, envMapIntensity: 0.5
+    });
+    const matFloor = new THREE.MeshStandardMaterial({
+      map: floorTex,
+      normalMap: floorTex.userData ? floorTex.userData.normalMap : null,
+      roughnessMap: floorTex.userData ? floorTex.userData.roughnessMap : null,
+      roughness: 0.7, metalness: 0.1, envMapIntensity: 0.5
+    });
+    const matCeil = new THREE.MeshStandardMaterial({
+      map: ceilTex,
+      normalMap: ceilTex.userData ? ceilTex.userData.normalMap : null,
+      roughnessMap: ceilTex.userData ? ceilTex.userData.roughnessMap : null,
+      roughness: 0.9, metalness: 0.0, envMapIntensity: 0.3
+    });
 
     // Build rooms
     if (mapData.rooms && mapData.rooms.length > 0) {
@@ -771,7 +902,15 @@ const SceneBuilder = {
     }
     // Build lights
     for (let lt of mapData.lights) {
-      const light = new THREE.PointLight(lt.color, lt.intensity, 15, 2);
+      const light = new THREE.PointLight(lt.color, lt.intensity * 2, 15, 2);
+      light.position.set(lt.position.x, lt.position.y, lt.position.z);
+      light.castShadow = true;
+      light.shadow.mapSize.width = 512;
+      light.shadow.mapSize.height = 512;
+      light.shadow.camera.near = 0.5;
+      light.shadow.camera.far = 15;
+      light.shadow.bias = -0.001;
+      Game.scene.add(light);
       light.position.copy(lt.position);
       Game.scene.add(light);
       Game.lights.push({ light, data: lt });
@@ -786,7 +925,7 @@ const SceneBuilder = {
     // Build loot boxes
     for (let lb of mapData.lootBoxes) {
       const geo = new THREE.BoxGeometry(0.8, 0.6, 0.8);
-      const mat = new THREE.MeshLambertMaterial({ map: TextureFactory.crateTexture() });
+      const mat = new THREE.MeshStandardMaterial({ map: TextureFactory.crateTexture(), roughness: 0.75, metalness: 0.1 });
       const mesh = new THREE.Mesh(geo, mat);
       mesh.position.copy(lb.position);
       mesh.position.y = 0.3;
@@ -804,7 +943,7 @@ const SceneBuilder = {
     for (let ep of mapData.extractPoints) {
       // Red door
       const doorGeo = new THREE.BoxGeometry(1.5, 2.5, 0.2);
-      const doorMat = new THREE.MeshLambertMaterial({ color: 0xff0000, emissive: 0x440000 });
+      const doorMat = new THREE.MeshStandardMaterial({ color: 0xff0000, emissive: 0x440000, emissiveIntensity: 0.5, roughness: 0.4, metalness: 0.3 });
       const door = new THREE.Mesh(doorGeo, doorMat);
       door.position.copy(ep.position); door.position.y = 1.25;
       Game.scene.add(door);
@@ -816,7 +955,7 @@ const SceneBuilder = {
     }
     // Build safe house marker
     if (mapData.safeHouse) {
-      const markerGeo = new THREE.CylinderGeometry(1.5, 1.5, 0.1, 16);
+      const markerGeo = new THREE.CylinderGeometry(1.5, 1.5, 0.1, 64);
       const markerMat = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.3 });
       const marker = new THREE.Mesh(markerGeo, markerMat);
       marker.position.copy(mapData.safeHouse); marker.position.y = 0.05;
@@ -829,7 +968,7 @@ const SceneBuilder = {
     if (mapData.hiddenDoors) {
       for (let hd of mapData.hiddenDoors) {
         const geo = new THREE.BoxGeometry(1.2, 2.2, 0.15);
-        const mat = new THREE.MeshLambertMaterial({ color: 0x333322 });
+        const mat = new THREE.MeshStandardMaterial({ color: 0x333322, roughness: 0.9, metalness: 0.0 });
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.copy(hd.position); mesh.position.y = 1.1;
         Game.scene.add(mesh);
@@ -852,17 +991,17 @@ const SceneBuilder = {
     if (mapData.isChase) {
       // Floor
       const floorGeo = new THREE.PlaneGeometry(4, 120);
-      const floorMat = new THREE.MeshLambertMaterial({ color: 0x2a0000 });
+      const floorMat = new THREE.MeshStandardMaterial({ color: 0x2a0000, roughness: 0.8, metalness: 0.05 });
       const floor = new THREE.Mesh(floorGeo, floorMat);
       floor.rotation.x = -Math.PI / 2; floor.position.set(0, 0, 60);
-      Game.scene.add(floor);
+      floor.receiveShadow=true;floor.castShadow=true;Game.scene.add(floor);
       // Ceiling
       const ceil = new THREE.Mesh(floorGeo, matCeil);
       ceil.rotation.x = Math.PI / 2; ceil.position.set(0, 3, 60);
-      Game.scene.add(ceil);
+      ceil.receiveShadow=true;Game.scene.add(ceil);
       // Walls
       const wallGeoL = new THREE.PlaneGeometry(120, 3);
-      const wallMatR = new THREE.MeshLambertMaterial({ color: 0x4a0000 });
+      const wallMatR = new THREE.MeshStandardMaterial({ color: 0x4a0000, roughness: 0.8, metalness: 0.05 });
       const wL = new THREE.Mesh(wallGeoL, wallMatR); wL.position.set(-2, 1.5, 60); wL.rotation.y = Math.PI/2; Game.scene.add(wL);
       const wR = new THREE.Mesh(wallGeoL, wallMatR); wR.position.set(2, 1.5, 60); wR.rotation.y = -Math.PI/2; Game.scene.add(wR);
     }
@@ -873,18 +1012,18 @@ const SceneBuilder = {
     const floorGeo = new THREE.PlaneGeometry(room.width, room.depth);
     const floor = new THREE.Mesh(floorGeo, matFloor);
     floor.rotation.x = -Math.PI / 2; floor.position.set(room.x, 0, room.z);
-    Game.scene.add(floor);
+    floor.receiveShadow = true; floor.receiveShadow=true;floor.castShadow=true;Game.scene.add(floor);
     // Ceiling
     const ceil = new THREE.Mesh(floorGeo, matCeil);
     ceil.rotation.x = Math.PI / 2; ceil.position.set(room.x, 3, room.z);
-    Game.scene.add(ceil);
+    ceil.receiveShadow = true; ceil.receiveShadow=true;Game.scene.add(ceil);
     // Walls (visual only, collision is separate)
     const wallNGeo = new THREE.PlaneGeometry(room.width, 3);
-    const wallN = new THREE.Mesh(wallNGeo, matWall); wallN.position.set(room.x, 1.5, room.z - hd); Game.scene.add(wallN);
-    const wallS = new THREE.Mesh(wallNGeo, matWall); wallS.position.set(room.x, 1.5, room.z + hd); wallS.rotation.y = Math.PI; Game.scene.add(wallS);
+    const wallN = new THREE.Mesh(wallNGeo, matWall); wallN.position.set(room.x, 1.5, room.z - hd); wallN.receiveShadow = true; wallN.castShadow = true; Game.scene.add(wallN);
+    const wallS = new THREE.Mesh(wallNGeo, matWall); wallS.position.set(room.x, 1.5, room.z + hd); wallS.rotation.y = Math.PI; wallS.receiveShadow = true; wallS.castShadow = true; Game.scene.add(wallS);
     const wallEGeo = new THREE.PlaneGeometry(room.depth, 3);
-    const wallE = new THREE.Mesh(wallEGeo, matWall); wallE.position.set(room.x + hw, 1.5, room.z); wallE.rotation.y = -Math.PI/2; Game.scene.add(wallE);
-    const wallW = new THREE.Mesh(wallEGeo, matWall); wallW.position.set(room.x - hw, 1.5, room.z); wallW.rotation.y = Math.PI/2; Game.scene.add(wallW);
+    const wallE = new THREE.Mesh(wallEGeo, matWall); wallE.position.set(room.x + hw, 1.5, room.z); wallE.rotation.y = -Math.PI/2; wallE.receiveShadow = true; wallE.castShadow = true; Game.scene.add(wallE);
+    const wallW = new THREE.Mesh(wallEGeo, matWall); wallW.position.set(room.x - hw, 1.5, room.z); wallW.rotation.y = Math.PI/2; wallW.receiveShadow = true; wallW.castShadow = true; Game.scene.add(wallW);
     // Special room coloring
     if (room.type === 'safe') {
       const ringGeo = new THREE.RingGeometry(1, 1.4, 16);
@@ -913,22 +1052,22 @@ const SceneBuilder = {
       const floorGeo = new THREE.PlaneGeometry(floorW, floorD);
       const floor = new THREE.Mesh(floorGeo, matFloor);
       floor.rotation.x = -Math.PI / 2; floor.position.set(cx, 0, cz);
-      Game.scene.add(floor);
+      floor.receiveShadow=true;floor.castShadow=true;Game.scene.add(floor);
       const ceil = new THREE.Mesh(floorGeo, matCeil);
       ceil.rotation.x = Math.PI / 2; ceil.position.set(cx, 3, cz);
-      Game.scene.add(ceil);
+      ceil.receiveShadow=true;Game.scene.add(ceil);
     }
   },
   _buildItem(item) {
     let geo, mat;
     if (item.kind === 'ammo') {
-      geo = new THREE.BoxGeometry(0.3, 0.2, 0.3); mat = new THREE.MeshLambertMaterial({ color: 0x8a7a2e });
+      geo = new THREE.BoxGeometry(0.3, 0.2, 0.3); mat = new THREE.MeshStandardMaterial({ color: 0x8a7a2e, roughness: 0.7, metalness: 0.2 });
     } else if (item.kind === 'coin') {
-      geo = new THREE.CylinderGeometry(0.15, 0.15, 0.05, 8); mat = new THREE.MeshBasicMaterial({ color: 0xffdd00 });
+      geo = new THREE.CylinderGeometry(0.15, 0.15, 0.05, 32); mat = new THREE.MeshBasicMaterial({ color: 0xffdd00 });
     } else if (item.kind === 'syringe') {
-      geo = new THREE.CylinderGeometry(0.05, 0.05, 0.3, 6); mat = new THREE.MeshLambertMaterial({ color: 0x00ffff });
+      geo = new THREE.CylinderGeometry(0.05, 0.05, 0.3, 24); mat = new THREE.MeshStandardMaterial({ color: 0x00ffff, emissive: 0x00aaaa, emissiveIntensity: 0.8, roughness: 0.3, metalness: 0.6 });
     } else {
-      geo = new THREE.BoxGeometry(0.2, 0.3, 0.2); mat = new THREE.MeshLambertMaterial({ color: 0x8a4040 });
+      geo = new THREE.BoxGeometry(0.2, 0.3, 0.2); mat = new THREE.MeshStandardMaterial({ color: 0x8a4040, roughness: 0.7, metalness: 0.1 });
     }
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.copy(item.position);
@@ -942,21 +1081,21 @@ const SceneBuilder = {
     const px = room.x + (Math.random() - 0.5) * (room.width - 3);
     const pz = room.z + (Math.random() - 0.5) * (room.depth - 3);
     if (type === 'table') {
-      const top = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.8), new THREE.MeshLambertMaterial({ color: 0x5a3a20 }));
-      top.position.set(px, 0.8, pz); Game.scene.add(top);
+      const top = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.8), new THREE.MeshStandardMaterial({ color: 0x5a3a20, roughness: 0.6, metalness: 0.15 }));
+      top.position.set(px, 0.8, pz); top.castShadow=true;top.receiveShadow=true;Game.scene.add(top);
       for (let i = 0; i < 4; i++) {
-        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.1), new THREE.MeshLambertMaterial({ color: 0x4a2a10 }));
-        leg.position.set(px + (i < 2 ? -0.65 : 0.65), 0.4, pz + (i % 2 ? -0.3 : 0.3)); Game.scene.add(leg);
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.8, 0.1), new THREE.MeshStandardMaterial({ color: 0x4a2a10, roughness: 0.6, metalness: 0.15 }));
+        leg.position.set(px + (i < 2 ? -0.65 : 0.65), 0.4, pz + (i % 2 ? -0.3 : 0.3)); leg.castShadow=true;Game.scene.add(leg);
       }
     } else if (type === 'shelf') {
-      const shelf = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 0.4), new THREE.MeshLambertMaterial({ color: 0x4a4a4a }));
-      shelf.position.set(px, 1, pz); Game.scene.add(shelf);
+      const shelf = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 0.4), new THREE.MeshStandardMaterial({ color: 0x4a4a4a, roughness: 0.5, metalness: 0.4 }));
+      shelf.position.set(px, 1, pz); shelf.castShadow=true;shelf.receiveShadow=true;Game.scene.add(shelf);
     } else if (type === 'pipe') {
-      const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 3, 8), new THREE.MeshLambertMaterial({ color: 0x665544 }));
-      pipe.rotation.z = Math.PI / 2; pipe.position.set(px, 2.5, pz); Game.scene.add(pipe);
+      const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 3, 32), new THREE.MeshStandardMaterial({ color: 0x665544, roughness: 0.4, metalness: 0.7 }));
+      pipe.rotation.z = Math.PI / 2; pipe.position.set(px, 2.5, pz); pipe.castShadow=true;Game.scene.add(pipe);
     } else {
-      const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 1, 12), new THREE.MeshLambertMaterial({ color: 0x4a2a2a }));
-      barrel.position.set(px, 0.5, pz); Game.scene.add(barrel);
+      const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 1, 32), new THREE.MeshStandardMaterial({ color: 0x4a2a2a, roughness: 0.5, metalness: 0.3 }));
+      barrel.position.set(px, 0.5, pz); barrel.castShadow=true;barrel.receiveShadow=true;Game.scene.add(barrel);
     }
   }
 };
@@ -1277,12 +1416,12 @@ const weaponController = {
   _createWeaponModel(type) {
     if (this.weaponModel) { Game.camera.remove(this.weaponModel); }
     const group = new THREE.Group();
-    const matBody = new THREE.MeshLambertMaterial({ color: 0x2a2a2a });
-    const matBarrel = new THREE.MeshLambertMaterial({ color: 0x1a1a1a });
-    const matGrip = new THREE.MeshLambertMaterial({ color: 0x1a1208 });
+    const matBody = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.3, metalness: 0.85 });
+    const matBarrel = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.25, metalness: 0.9 });
+    const matGrip = new THREE.MeshStandardMaterial({ color: 0x1a1208, roughness: 0.6, metalness: 0.1 });
 
     if (type === 'melee') {
-      const blade = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.02, 0.3), new THREE.MeshLambertMaterial({ color: 0xaaaabb }));
+      const blade = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.02, 0.3), new THREE.MeshStandardMaterial({ color: 0xaaaabb, roughness: 0.15, metalness: 0.95, envMapIntensity: 1.5 }));
       blade.position.set(0.3, -0.25, -0.3);
       group.add(blade);
     } else if (type === 'pg') {
@@ -1313,7 +1452,7 @@ const weaponController = {
       const stock = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.08, 0.12), matBody);
       stock.position.set(0, -0.02, 0.18); group.add(stock);
     } else if (type === 'sg') {
-      const body = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.12, 0.3), new THREE.MeshLambertMaterial({ color: 0x4a2810 }));
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.12, 0.3), new THREE.MeshStandardMaterial({ color: 0x4a2810, roughness: 0.5, metalness: 0.3 }));
       body.position.set(0, 0, 0); group.add(body);
       const grip = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.12, 0.06), matGrip);
       grip.position.set(0, -0.11, 0.08); group.add(grip);
@@ -1328,7 +1467,7 @@ const weaponController = {
       mag.position.set(0, -0.08, 0); group.add(mag);
       const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.3, 6), matBarrel);
       barrel.rotation.x = Math.PI/2; barrel.position.set(0, 0.03, -0.28); group.add(barrel);
-      const scope = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.12, 8), new THREE.MeshLambertMaterial({ color: 0x000000 }));
+      const scope = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.12, 24), new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.2, metalness: 0.8 }));
       scope.rotation.x = Math.PI/2; scope.position.set(0, 0.06, -0.05); group.add(scope);
     }
 
@@ -1408,13 +1547,13 @@ class Monster {
     this.mesh = this._createModel();
     this.mesh.userData.monster = this;
     this.mesh.position.copy(this.position);
-    Game.scene.add(this.mesh);
+    this.mesh.castShadow=true;this.mesh.receiveShadow=true;this.mesh.traverse(function(c){if(c.isMesh){c.castShadow=true;c.receiveShadow=true;}});Game.scene.add(this.mesh);
   }
 
   _createModel() {
     const def = this.def;
     const group = new THREE.Group();
-    const bodyMat = new THREE.MeshLambertMaterial({ color: def.color });
+    const bodyMat = new THREE.MeshStandardMaterial({ color: def.color, roughness: 0.5, metalness: 0.2, emissive: def.eyeColor, emissiveIntensity: 0.1 });
     const eyeMat = new THREE.MeshBasicMaterial({ color: def.eyeColor });
 
     if (this.type === 'hound') {
@@ -1465,7 +1604,7 @@ class Monster {
     } else if (this.type === 'skinstealer') {
       // Disguised as crate or humanoid
       if (this.disguiseActive) {
-        const crate = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.6, 0.7), new THREE.MeshLambertMaterial({ map: TextureFactory.crateTexture() }));
+        const crate = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.6, 0.7), new THREE.MeshStandardMaterial({ map: TextureFactory.crateTexture(), roughness: 0.75, metalness: 0.1 }));
         crate.position.y = 0.3; group.add(crate);
       } else {
         const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.5, 0.4), bodyMat);
@@ -1668,7 +1807,7 @@ class Monster {
       this.mesh = this._createModel();
       this.mesh.userData.monster = this;
       this.mesh.position.copy(this.position);
-      Game.scene.add(this.mesh);
+      this.mesh.castShadow=true;this.mesh.receiveShadow=true;this.mesh.traverse(function(c){if(c.isMesh){c.castShadow=true;c.receiveShadow=true;}});Game.scene.add(this.mesh);
       AudioSystem.playMonsterGrowl('skinstealer');
       this.state = 'chase';
       uiSystem.showMessage('那不是箱子！', 2000, '#ff0000');
@@ -1740,7 +1879,7 @@ class Monster {
         this.mesh = this._createModel();
         this.mesh.userData.monster = this;
         this.mesh.position.copy(this.position);
-        Game.scene.add(this.mesh);
+        this.mesh.castShadow=true;this.mesh.receiveShadow=true;this.mesh.traverse(function(c){if(c.isMesh){c.castShadow=true;c.receiveShadow=true;}});Game.scene.add(this.mesh);
       }
     }
   }
@@ -2840,9 +2979,26 @@ function initGame() {
   Game.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   Game.renderer.shadowMap.enabled = true;
   Game.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  Game.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  Game.renderer.toneMappingExposure = 1.0;
+  Game.renderer.outputEncoding = THREE.sRGBEncoding;
+  Game.renderer.physicallyCorrectLights = true;
   document.body.appendChild(Game.renderer.domElement);
   Game.renderer.domElement.id = 'gameCanvas';
-  
+
+  // Post-processing: Bloom for cinematic glow
+  Game.composer = new THREE.EffectComposer(Game.renderer);
+  Game.composer.addPass(new THREE.RenderPass(Game.scene, Game.camera));
+  const bloomPass = new THREE.UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    0.6, 0.4, 0.85
+  );
+  Game.composer.addPass(bloomPass);
+  if (THREE.OutputPass) {
+    Game.composer.addPass(new THREE.OutputPass());
+  }
+  Game.bloomPass = bloomPass;
+
   AudioSystem.init();
   setupInputs();
   uiSystem.showMainMenu();
@@ -2890,6 +3046,10 @@ function setupInputs() {
     Game.camera.aspect = window.innerWidth/window.innerHeight;
     Game.camera.updateProjectionMatrix();
     Game.renderer.setSize(window.innerWidth, window.innerHeight);
+    if (Game.composer) {
+      Game.composer.setSize(window.innerWidth, window.innerHeight);
+      if (Game.bloomPass) Game.bloomPass.resolution.set(window.innerWidth, window.innerHeight);
+    }
   });
   
   document.addEventListener('contextmenu', e => e.preventDefault());
@@ -3281,7 +3441,11 @@ function animate() {
   }
   
   if (Game.renderer && Game.scene && Game.camera) {
-    Game.renderer.render(Game.scene, Game.camera);
+    if (Game.composer) {
+      Game.composer.render();
+    } else {
+      Game.renderer.render(Game.scene, Game.camera);
+    }
   }
 }
 
