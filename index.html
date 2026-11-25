@@ -1009,6 +1009,57 @@ const SceneBuilder = {
     if (mapData.rooms && mapData.rooms.length > 0) {
       for (let room of mapData.rooms) {
         this._buildRoom(room, matWall, matFloor, matCeil, cfg);
+        // Level-specific props
+        if (levelIndex === 5) {
+          // Poolrooms: water surface in some rooms
+          if (Math.random() < 0.4) {
+            const waterGeo = new THREE.PlaneGeometry(room.width - 1, room.depth - 1);
+            const waterMat = new THREE.MeshStandardMaterial({ color: 0x2a8a9a, transparent: true, opacity: 0.6, roughness: 0.1, metalness: 0.3, envMapIntensity: 1.5 });
+            const water = new THREE.Mesh(waterGeo, waterMat);
+            water.rotation.x = -Math.PI / 2; water.position.set(room.x, 0.05, room.z);
+            Game.scene.add(water);
+          }
+        } else if (levelIndex === 3) {
+          // Electrical Station: electrical boxes
+          if (Math.random() < 0.3) {
+            const boxGeo = new THREE.BoxGeometry(0.6, 1.2, 0.3);
+            const boxMat = new THREE.MeshStandardMaterial({ color: 0x3a4a5a, roughness: 0.4, metalness: 0.7 });
+            const ebox = new THREE.Mesh(boxGeo, boxMat);
+            ebox.position.set(room.x + (Math.random()-0.5) * (room.width-2), 0.6, room.z + (Math.random()-0.5) * (room.depth-2));
+            ebox.castShadow = true; Game.scene.add(ebox);
+            // Sparks light
+            const sparkLight = new THREE.PointLight(0x44aaff, 0.3, 3);
+            sparkLight.position.copy(ebox.position); sparkLight.position.y = 1.2;
+            Game.scene.add(sparkLight);
+          }
+        } else if (levelIndex === 6) {
+          // Thermal Halls: steam pipes
+          if (Math.random() < 0.35) {
+            const pipeGeo = new THREE.CylinderGeometry(0.2, 0.2, room.width, 24);
+            const pipeMat = new THREE.MeshStandardMaterial({ color: 0x8a4a2a, roughness: 0.5, metalness: 0.6 });
+            const pipe = new THREE.Mesh(pipeGeo, pipeMat);
+            pipe.rotation.z = Math.PI / 2;
+            pipe.position.set(room.x, 2.5, room.z + (Math.random()-0.5) * (room.depth-2));
+            pipe.castShadow = true; Game.scene.add(pipe);
+          }
+        } else if (levelIndex === 8) {
+          // The Hive: organic growths
+          if (Math.random() < 0.3) {
+            for (let g = 0; g < 3; g++) {
+              const growth = new THREE.Mesh(
+                new THREE.SphereGeometry(0.15 + Math.random() * 0.2, 16, 12),
+                new THREE.MeshStandardMaterial({ color: 0x6a2a3a, roughness: 0.8, metalness: 0.1 })
+              );
+              growth.position.set(
+                room.x + (Math.random()-0.5) * (room.width-1),
+                0.15 + Math.random() * 1.5,
+                room.z + (Math.random()-0.5) * (room.depth-1)
+              );
+              growth.scale.set(1, 1.5 + Math.random(), 1);
+              growth.castShadow = true; Game.scene.add(growth);
+            }
+          }
+        }
       }
     }
     // Build corridors
@@ -1031,13 +1082,29 @@ const SceneBuilder = {
       light.position.copy(lt.position);
       Game.scene.add(light);
       Game.lights.push({ light, data: lt });
-      // Light fixture
-      const fixtureGeo = new THREE.BoxGeometry(0.5, 0.1, 0.5);
-      const fixtureMat = new THREE.MeshBasicMaterial({ color: lt.color });
-      const fixture = new THREE.Mesh(fixtureGeo, fixtureMat);
-      fixture.position.copy(lt.position);
-      fixture.position.y += 0.2;
-      Game.scene.add(fixture);
+      // Light fixture — fluorescent tube with housing
+      const housingGeo = new THREE.BoxGeometry(0.6, 0.12, 0.15);
+      const housingMat = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.4, metalness: 0.8 });
+      const housing = new THREE.Mesh(housingGeo, housingMat);
+      housing.position.copy(lt.position);
+      housing.position.y += 0.15;
+      housing.castShadow = true;
+      Game.scene.add(housing);
+      // Tube light (glowing)
+      const tubeGeo = new THREE.BoxGeometry(0.5, 0.04, 0.08);
+      const tubeMat = new THREE.MeshBasicMaterial({ color: lt.color });
+      const tube = new THREE.Mesh(tubeGeo, tubeMat);
+      tube.position.copy(lt.position);
+      tube.position.y += 0.1;
+      Game.scene.add(tube);
+      // End caps
+      for (const side of [-1, 1]) {
+        const cap = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.1), housingMat);
+        cap.position.copy(lt.position);
+        cap.position.x += side * 0.27;
+        cap.position.y += 0.1;
+        Game.scene.add(cap);
+      }
     }
     // Build loot boxes
     for (let lb of mapData.lootBoxes) {
@@ -1329,7 +1396,7 @@ const SceneBuilder = {
     const matFabric = new THREE.MeshStandardMaterial({ color: 0x4a3a2a, roughness: 0.95, metalness: 0.0 });
 
     if (type === 'table') {
-      // \u684c\u5b50\uff1a\u684c\u9762+4\u817f+\u91d1\u5c5e\u8fb9\u6846
+      // 桌子：桌面+4腿+金属边框
       addMesh(new THREE.BoxGeometry(1.5, 0.08, 0.8), matWood, px, 0.8, pz);
       addMesh(new THREE.BoxGeometry(1.55, 0.04, 0.05), matMetalDark, px, 0.82, pz - 0.4);
       addMesh(new THREE.BoxGeometry(1.55, 0.04, 0.05), matMetalDark, px, 0.82, pz + 0.4);
@@ -1342,7 +1409,7 @@ const SceneBuilder = {
       addMesh(new THREE.BoxGeometry(1.3, 0.04, 0.04), matMetalDark, px, 0.25, pz - 0.3);
       addMesh(new THREE.BoxGeometry(1.3, 0.04, 0.04), matMetalDark, px, 0.25, pz + 0.3);
     } else if (type === 'shelf') {
-      // \u8d27\u67b6\uff1a\u591a\u5c42\u67b6\u5b50(3-4\u5c42)\uff0c\u6bcf\u5c42\u6709\u968f\u673a\u5c0f\u7269\u54c1
+      // 货架：多层架子(3-4层)，每层有随机小物品
       const layers = 3 + Math.floor(Math.random() * 2);
       const matShelfWood = new THREE.MeshStandardMaterial({ color: 0x4a3a20, roughness: 0.7, metalness: 0.1 });
       for (let i = 0; i < 4; i++) {
@@ -1366,7 +1433,7 @@ const SceneBuilder = {
       }
       addMesh(new THREE.BoxGeometry(1.1, 2.0, 0.03), matWoodDark, px, 1.1, pz + 0.22);
     } else if (type === 'pipe') {
-      // \u7ba1\u9053\uff1a\u5f2f\u66f2\u7ba1\u9053(\u591a\u4e2aCylinderGeometry\u7ec4\u5408)\uff0c\u5e26\u9600\u95e8
+      // 管道：弯曲管道(多个CylinderGeometry组合)，带阀门
       addMesh(new THREE.CylinderGeometry(0.12, 0.12, 2.5, 16), matMetal, px, 2.8, pz, 0, 0, Math.PI / 2);
       addMesh(new THREE.CylinderGeometry(0.12, 0.12, 1.0, 16), matMetal, px + 1.0, 2.3, pz);
       addMesh(new THREE.SphereGeometry(0.14, 16, 16), matMetal, px + 1.0, 2.8, pz);
@@ -1377,7 +1444,7 @@ const SceneBuilder = {
       addMesh(new THREE.BoxGeometry(0.05, 0.4, 0.1), matMetalDark, px, 2.6, pz);
       addMesh(new THREE.CylinderGeometry(0.121, 0.121, 0.3, 16, 1, false, 0, Math.PI * 0.4), matRust, px + 0.5, 2.8, pz, 0, 0, Math.PI / 2);
     } else if (type === 'barrel') {
-      // \u6876\uff1a\u5706\u67f1\u4f53+\u9876\u76d6+\u9508\u8ff9\u7eb9\u7406\uff0c\u6709\u4e9b\u503e\u5012
+      // 桶：圆柱体+顶盖+锈迹纹理，有些倾倒
       const tipped = Math.random() > 0.6;
       if (tipped) {
         addMesh(new THREE.CylinderGeometry(0.35, 0.35, 1.0, 24), matRust, px, 0.35, pz, 0, 0, Math.PI / 2);
@@ -1394,7 +1461,7 @@ const SceneBuilder = {
         addMesh(new THREE.BoxGeometry(0.15, 0.6, 0.02), matRust, px + 0.3, 0.5, pz + 0.33);
       }
     } else if (type === 'chair') {
-      // \u6905\u5b50\uff1a\u5ea7\u6905\u9762+\u9760\u80cc+4\u817f
+      // 椅子：座椅面+靠背+4腿
       addMesh(new THREE.BoxGeometry(0.5, 0.05, 0.5), matWood, px, 0.5, pz);
       addMesh(new THREE.BoxGeometry(0.5, 0.6, 0.05), matWood, px, 0.8, pz - 0.22);
       addMesh(new THREE.BoxGeometry(0.04, 0.55, 0.04), matWood, px - 0.15, 0.8, pz - 0.2);
@@ -1406,7 +1473,7 @@ const SceneBuilder = {
       addMesh(new THREE.BoxGeometry(0.4, 0.03, 0.03), matWoodDark, px, 0.15, pz - 0.2);
       addMesh(new THREE.BoxGeometry(0.4, 0.03, 0.03), matWoodDark, px, 0.15, pz + 0.2);
     } else if (type === 'cabinet') {
-      // \u67dc\u5b50\uff1a\u9ad8\u67dc\u4f53+\u95e8\u628a\u624b
+      // 柜子：高柜体+门把手
       addMesh(new THREE.BoxGeometry(0.8, 1.8, 0.5), matWoodDark, px, 0.9, pz);
       addMesh(new THREE.BoxGeometry(0.85, 0.06, 0.55), matWood, px, 1.83, pz);
       addMesh(new THREE.BoxGeometry(0.85, 0.06, 0.55), matWood, px, 0.03, pz);
@@ -1422,7 +1489,7 @@ const SceneBuilder = {
       addMesh(new THREE.SphereGeometry(0.03, 16, 16), matMetalDark, px + 0.05, 0.98, pz + 0.28);
       addMesh(new THREE.SphereGeometry(0.03, 16, 16), matMetalDark, px + 0.05, 0.82, pz + 0.28);
     } else if (type === 'sandbag') {
-      // \u6c99\u888b\uff1a\u60ac\u6302\u7684\u5706\u67f1\u5f62\u6c99\u888b(Level 1\u98ce\u683c)
+      // 沙袋：悬挂的圆柱形沙袋(Level 1风格)
       addMesh(new THREE.BoxGeometry(0.1, 0.3, 0.1), matMetalDark, px, 2.85, pz);
       addMesh(new THREE.CylinderGeometry(0.015, 0.015, 0.5, 8), matMetal, px, 2.45, pz);
       addMesh(new THREE.SphereGeometry(0.2, 16, 16), matFabric, px, 2.1, pz);
@@ -1433,7 +1500,7 @@ const SceneBuilder = {
       addMesh(new THREE.TorusGeometry(0.22, 0.01, 8, 24), matWoodDark, px, 2.0, pz, Math.PI / 2);
       addMesh(new THREE.TorusGeometry(0.22, 0.01, 8, 24), matWoodDark, px, 1.4, pz, Math.PI / 2);
     } else if (type === 'equipment') {
-      // \u5e9f\u5f03\u8bbe\u5907\uff1a\u7834\u635f\u7684\u91d1\u5c5e\u7bb1\u5b50+\u7535\u7ebf
+      // 废弃设备：破损的金属箱子+电线
       addMesh(new THREE.BoxGeometry(1.0, 0.7, 0.7), matMetalDark, px, 0.5, pz);
       addMesh(new THREE.BoxGeometry(1.0, 0.05, 0.7), matRust, px, 0.88, pz, 0.2, 0, 0.3);
       addMesh(new THREE.BoxGeometry(0.02, 0.3, 0.4), matRust, px + 0.51, 0.4, pz);
@@ -1447,7 +1514,7 @@ const SceneBuilder = {
       addMesh(new THREE.BoxGeometry(0.02, 0.12, 0.02), matMetalDark, px, 0.35, pz - 0.37);
       addMesh(new THREE.BoxGeometry(0.02, 0.12, 0.02), matMetalDark, px + 0.1, 0.35, pz - 0.37);
     } else if (type === 'waterpipe') {
-      // \u6c34\u7ba1\uff1a\u4ece\u5929\u82b1\u677f\u5782\u4e0b\u7684\u7ba1\u9053+\u6ef4\u6c34\u6548\u679c
+      // 水管：从天花板垂下的管道+滴水效果
       addMesh(new THREE.CylinderGeometry(0.1, 0.1, 1.2, 16), matMetal, px, 2.4, pz);
       addMesh(new THREE.CylinderGeometry(0.13, 0.13, 0.1, 16), matMetalDark, px, 2.95, pz);
       addMesh(new THREE.SphereGeometry(0.12, 16, 16), matMetal, px, 1.8, pz);
@@ -1459,7 +1526,7 @@ const SceneBuilder = {
       addMesh(new THREE.BoxGeometry(0.06, 0.15, 0.1), matMetalDark, px, 2.6, pz + 0.15);
       addMesh(new THREE.CylinderGeometry(0.101, 0.101, 0.3, 16), matRust, px, 2.0, pz);
     } else if (type === 'barricade') {
-      // \u6728\u677f\u8def\u969c\uff1a\u503e\u659c\u7684\u6728\u677f
+      // 木板路障：倾斜的木板
       const angle = 0.3 + Math.random() * 0.2;
       addMesh(new THREE.BoxGeometry(1.2, 0.06, 0.3), matWood, px, 0.6, pz, 0, 0, angle);
       addMesh(new THREE.BoxGeometry(1.0, 0.05, 0.25), matWoodDark, px + 0.1, 0.9, pz, 0, 0, -angle * 0.8);
