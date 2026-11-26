@@ -327,7 +327,19 @@ const CONFIG = {
     { name: "Thermal Halls", desc: "炽热的走廊。蒸汽从管道中喷涌，温度让人难以呼吸。", wallColor: 0x8a4a2a, floorColor: 0x5a2a1a, ceilColor: 0x6a3a2a, fogColor: 0x2a0a05, ambientIntensity: 0.2, lightColor: 0xff8844, monsterTypes: ['hound','partygoer'], roomCount: 19 },
     { name: "The Abandoned Mall", desc: "废弃商场。扶梯早已停转，橱窗后的假人似乎在看着你。", wallColor: 0x6a6a7a, floorColor: 0x4a4a5a, ceilColor: 0x5a5a6a, fogColor: 0x1a1a2a, ambientIntensity: 0.25, lightColor: 0xddddff, monsterTypes: ['stalker','smiler','partygoer'], roomCount: 24 },
     { name: "The Hive", desc: "活体组织构成的墙壁。某种巨大生物的巢穴。心跳声无处不在。", wallColor: 0x7a2a3a, floorColor: 0x4a1a2a, ceilColor: 0x5a2a3a, fogColor: 0x1a050a, ambientIntensity: 0.15, lightColor: 0xff4466, monsterTypes: ['skinstealer','hound','stalker'], roomCount: 21 },
-    { name: "The Threshold", desc: "后室的核心。现实与虚空的交界。SBM所说的'真相'就在前方。", wallColor: 0x2a2a4a, floorColor: 0x1a1a2a, ceilColor: 0x2a2a3a, fogColor: 0x05050a, ambientIntensity: 0.1, lightColor: 0xaaaaff, monsterTypes: ['hound','stalker','smiler','skinstealer','partygoer'], roomCount: 1, isChase: true, isFinal: true }
+    { name: "The Threshold", desc: "后室的核心。现实与虚空的交界。编排者——曾经的探员#0000——在此等待终结。", wallColor: 0x2a2a4a, floorColor: 0x1a1a2a, ceilColor: 0x2a2a3a, fogColor: 0x05050a, ambientIntensity: 0.1, lightColor: 0xaaaaff, monsterTypes: ['hound','stalker','smiler','skinstealer','partygoer'], roomCount: 1, isChase: true },
+
+    // ===== 第二章：崩塌之后 =====
+    { name: "The Subway", desc: "编排者死后，后室开始崩塌。你在虚空中坠落，醒来时身处一座无尽的地铁隧道。", wallColor: 0x3a3530, floorColor: 0x2a2520, ceilColor: 0x2a2520, fogColor: 0x0a0805, ambientIntensity: 0.15, lightColor: 0xffaa44, monsterTypes: ['hound','skinstealer'], roomCount: 8 },
+    { name: "The Library", desc: "无尽的书架延伸到视线尽头。每本书都记录着一个被困在后室的灵魂的故事。", wallColor: 0x4a3a2a, floorColor: 0x3a2a1a, ceilColor: 0x5a4a3a, fogColor: 0x100805, ambientIntensity: 0.2, lightColor: 0xddcc88, monsterTypes: ['stalker','smiler'], roomCount: 9 },
+    { name: "The Parking Garage", desc: "混凝土柱子组成的迷宫。你的脚步声在空旷中回荡，但你听到的回声不止一种。", wallColor: 0x4a4a4a, floorColor: 0x3a3a3a, ceilColor: 0x3a3a3a, fogColor: 0x080808, ambientIntensity: 0.18, lightColor: 0xffffaa, monsterTypes: ['hound','partygoer','skinstealer'], roomCount: 10 },
+    { name: "The Mirror Maze", desc: "镜面组成的走廊。你的倒影开始拥有自己的意志。不要盯着镜子里的自己太久。", wallColor: 0x6a6a8a, floorColor: 0x2a2a3a, ceilColor: 0x5a5a7a, fogColor: 0x0a0a15, ambientIntensity: 0.12, lightColor: 0xaaaadd, monsterTypes: ['stalker','smiler'], roomCount: 8 },
+    { name: "The Cinema", desc: "废弃的电影院里，银幕上播放着你从未经历过的记忆。座位上坐着不该存在的东西。", wallColor: 0x5a2a2a, floorColor: 0x3a1a1a, ceilColor: 0x4a1a1a, fogColor: 0x0a0303, ambientIntensity: 0.1, lightColor: 0xff8844, monsterTypes: ['partygoer','smiler','stalker'], roomCount: 7 },
+    { name: "The Hospital", desc: "后室的伤病都被送到这里。病床上的痕迹暗示，没有人在这里康复过。", wallColor: 0x8a8a8a, floorColor: 0x6a6a6a, ceilColor: 0x9a9a9a, fogColor: 0x0a0a0a, ambientIntensity: 0.22, lightColor: 0xeeeeff, monsterTypes: ['skinstealer','hound','stalker'], roomCount: 9 },
+    { name: "The Toy Store", desc: "货架上的毛绒玩具都在看着你。当你的视线移开时，它们的位置发生了变化。", wallColor: 0x4a2a4a, floorColor: 0x3a1a3a, ceilColor: 0x5a3a5a, fogColor: 0x0a050a, ambientIntensity: 0.2, lightColor: 0xddaadd, monsterTypes: ['partygoer','skinstealer'], roomCount: 8 },
+    { name: "The Catacombs", desc: "由无数骨骼堆砌的地下墓穴。墙壁会低语，它们曾是和你一样的探员。", wallColor: 0x5a4a3a, floorColor: 0x4a3a2a, ceilColor: 0x3a2a1a, fogColor: 0x050302, ambientIntensity: 0.08, lightColor: 0xff6633, monsterTypes: ['hound','stalker','smiler','skinstealer','partygoer'], roomCount: 10 },
+    { name: "The Void", desc: "所有后室楼层之间的空间。没有地面，没有天花板，只有漂浮的残骸和永恒的坠落感。", wallColor: 0x000010, floorColor: 0x000008, ceilColor: 0x000015, fogColor: 0x000005, ambientIntensity: 0.05, lightColor: 0x4466ff, monsterTypes: ['stalker','smiler'], roomCount: 6, isChase: true },
+    { name: "The Core", desc: "后室的真正核心。编排者只是一个守护者——真正的创造者，一个被称为'建筑师'的存在，在这里等待了亿万年。", wallColor: 0x1a0a2a, floorColor: 0x0a0515, ceilColor: 0x2a1a3a, fogColor: 0x0a0005, ambientIntensity: 0.06, lightColor: 0xff33aa, monsterTypes: ['hound','stalker','smiler','skinstealer','partygoer'], roomCount: 1, isChase: true, isFinal: true }
   ]
 };
 
@@ -1058,6 +1070,244 @@ const SceneBuilder = {
               growth.scale.set(1, 1.5 + Math.random(), 1);
               growth.castShadow = true; Game.scene.add(growth);
             }
+          }
+        } else if (levelIndex === 10) {
+          // The Subway: train cars and tracks
+          for (let t = 0; t < 2; t++) {
+            const carBody = new THREE.Mesh(
+              new THREE.BoxGeometry(4, 2.2, 8),
+              new THREE.MeshStandardMaterial({ color: 0x556b7a, roughness: 0.6, metalness: 0.5 })
+            );
+            carBody.position.set(room.x + (Math.random()-0.5)*2, 1.4, room.z + (Math.random()-0.5)*(room.depth-4));
+            carBody.castShadow = true; carBody.receiveShadow = true; Game.scene.add(carBody);
+            // Windows
+            for (let w = 0; w < 5; w++) {
+              const winGeo = new THREE.BoxGeometry(4.05, 0.7, 1.2);
+              const winMat = new THREE.MeshStandardMaterial({ color: 0x1a1a2a, roughness: 0.1, metalness: 0.2, transparent: true, opacity: 0.7 });
+              const win = new THREE.Mesh(winGeo, winMat);
+              win.position.copy(carBody.position);
+              win.position.y = 1.6;
+              win.position.z += -3.5 + w * 1.5;
+              win.castShadow = true; Game.scene.add(win);
+            }
+            // Roof
+            const roof = new THREE.Mesh(new THREE.BoxGeometry(4.1, 0.3, 8), new THREE.MeshStandardMaterial({ color: 0x3a4a5a, roughness: 0.7, metalness: 0.3 }));
+            roof.position.copy(carBody.position); roof.position.y = 2.65; roof.castShadow = true; Game.scene.add(roof);
+            // Tracks
+            for (let r = 0; r < 2; r++) {
+              const rail = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.1, room.depth), new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.3, metalness: 0.9 }));
+              rail.position.set(carBody.position.x - 1.5 + r * 3, 0.05, room.z);
+              rail.receiveShadow = true; Game.scene.add(rail);
+            }
+          }
+        } else if (levelIndex === 11) {
+          // The Library: bookshelves
+          for (let b = 0; b < 4; b++) {
+            const shelfBody = new THREE.Mesh(new THREE.BoxGeometry(0.6, 3.5, 3), new THREE.MeshStandardMaterial({ color: 0x4a3520, roughness: 0.8, metalness: 0.05 }));
+            shelfBody.position.set(room.x + (Math.random()-0.5)*(room.width-2), 1.75, room.z + (Math.random()-0.5)*(room.depth-2));
+            shelfBody.castShadow = true; shelfBody.receiveShadow = true; Game.scene.add(shelfBody);
+            // Books on shelves (5 rows)
+            for (let row = 0; row < 5; row++) {
+              for (let bk = 0; bk < 8; bk++) {
+                const bookColors = [0x8a2a2a, 0x2a4a8a, 0x2a8a4a, 0x8a8a2a, 0x4a2a8a, 0x8a4a2a];
+                const book = new THREE.Mesh(
+                  new THREE.BoxGeometry(0.12, 0.35 + Math.random()*0.15, 0.25),
+                  new THREE.MeshStandardMaterial({ color: bookColors[Math.floor(Math.random()*bookColors.length)], roughness: 0.7, metalness: 0.1 })
+                );
+                book.position.set(shelfBody.position.x + 0.05, 0.5 + row * 0.65, shelfBody.position.z - 1.2 + bk * 0.3);
+                book.castShadow = true; Game.scene.add(book);
+              }
+            }
+            // Back panel
+            const back = new THREE.Mesh(new THREE.BoxGeometry(0.05, 3.5, 3), new THREE.MeshStandardMaterial({ color: 0x3a2510, roughness: 0.9 }));
+            back.position.set(shelfBody.position.x - 0.3, 1.75, shelfBody.position.z); Game.scene.add(back);
+          }
+        } else if (levelIndex === 12) {
+          // The Parking Garage: cars and pillars
+          const carColors = [0x8a2020, 0x20208a, 0x208a20, 0x8a8a20, 0x8a208a, 0x404040];
+          const carBody = new THREE.Mesh(
+            new THREE.BoxGeometry(2, 1.2, 4.5),
+            new THREE.MeshStandardMaterial({ color: carColors[Math.floor(Math.random()*carColors.length)], roughness: 0.4, metalness: 0.6 })
+          );
+          carBody.position.set(room.x + (Math.random()-0.5)*(room.width-3), 0.7, room.z + (Math.random()-0.5)*(room.depth-5));
+          carBody.castShadow = true; carBody.receiveShadow = true; Game.scene.add(carBody);
+          // Cabin (raised section)
+          const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.6, 2.5), new THREE.MeshStandardMaterial({ color: 0x1a1a2a, roughness: 0.2, metalness: 0.3, transparent: true, opacity: 0.7 }));
+          cabin.position.copy(carBody.position); cabin.position.y = 1.4; cabin.castShadow = true; Game.scene.add(cabin);
+          // Wheels (4)
+          for (let wx of [-0.9, 0.9]) {
+            for (let wz of [-1.5, 1.5]) {
+              const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.3, 20), new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.9 }));
+              wheel.rotation.z = Math.PI / 2;
+              wheel.position.set(carBody.position.x + wx, 0.4, carBody.position.z + wz);
+              wheel.castShadow = true; Game.scene.add(wheel);
+            }
+          }
+          // Traffic cones
+          for (let c = 0; c < 3; c++) {
+            const cone = new THREE.Mesh(new THREE.ConeGeometry(0.25, 0.6, 16), new THREE.MeshStandardMaterial({ color: 0xff6620, roughness: 0.5 }));
+            cone.position.set(room.x + (Math.random()-0.5)*(room.width-1), 0.3, room.z + (Math.random()-0.5)*(room.depth-1));
+            cone.castShadow = true; Game.scene.add(cone);
+          }
+        } else if (levelIndex === 13) {
+          // The Mirror Maze: mirror panels
+          for (let m = 0; m < 6; m++) {
+            const mirrorMat = new THREE.MeshStandardMaterial({ color: 0x1a1a2a, roughness: 0.05, metalness: 0.95, envMapIntensity: 2 });
+            const mirror = new THREE.Mesh(new THREE.BoxGeometry(0.1, 3, 2), mirrorMat);
+            mirror.position.set(room.x + (Math.random()-0.5)*(room.width-1), 1.5, room.z + (Math.random()-0.5)*(room.depth-1));
+            mirror.rotation.y = Math.random() * Math.PI;
+            mirror.castShadow = true; mirror.receiveShadow = true; Game.scene.add(mirror);
+            // Frame
+            const frame = new THREE.Mesh(new THREE.BoxGeometry(0.15, 3.1, 2.1), new THREE.MeshStandardMaterial({ color: 0x4a4a6a, roughness: 0.6, metalness: 0.4 }));
+            frame.position.copy(mirror.position); frame.rotation.copy(mirror.rotation); Game.scene.add(frame);
+          }
+        } else if (levelIndex === 14) {
+          // The Cinema: seats and screen
+          // Screen
+          const screenMat = new THREE.MeshStandardMaterial({ color: 0xddddaa, roughness: 0.3, metalness: 0.1, emissive: 0x444422, emissiveIntensity: 0.3 });
+          const screen = new THREE.Mesh(new THREE.BoxGeometry(6, 3.5, 0.2), screenMat);
+          screen.position.set(room.x, 2.5, room.z - room.depth/2 + 0.5);
+          screen.castShadow = true; Game.scene.add(screen);
+          // Screen frame
+          const sFrame = new THREE.Mesh(new THREE.BoxGeometry(6.4, 3.9, 0.1), new THREE.MeshStandardMaterial({ color: 0x2a1a1a, roughness: 0.8 }));
+          sFrame.position.copy(screen.position); sFrame.position.z -= 0.1; Game.scene.add(sFrame);
+          // Seats (rows)
+          for (let row = 0; row < 4; row++) {
+            for (let col = 0; col < 5; col++) {
+              const seatBase = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.5), new THREE.MeshStandardMaterial({ color: 0x5a1a1a, roughness: 0.7 }));
+              seatBase.position.set(room.x - 1.5 + col * 0.6, 0.3, room.z - 2 + row * 1.2);
+              seatBase.castShadow = true; Game.scene.add(seatBase);
+              const seatBack = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.7, 0.1), new THREE.MeshStandardMaterial({ color: 0x5a1a1a, roughness: 0.7 }));
+              seatBack.position.set(seatBase.position.x, 0.75, seatBase.position.z - 0.2);
+              seatBack.castShadow = true; Game.scene.add(seatBack);
+            }
+          }
+        } else if (levelIndex === 15) {
+          // The Hospital: beds and equipment
+          for (let b = 0; b < 3; b++) {
+            const bedFrame = new THREE.Mesh(new THREE.BoxGeometry(1, 0.3, 2.2), new THREE.MeshStandardMaterial({ color: 0x4a4a4a, roughness: 0.5, metalness: 0.6 }));
+            bedFrame.position.set(room.x + (Math.random()-0.5)*(room.width-2), 0.5, room.z + (Math.random()-0.5)*(room.depth-3));
+            bedFrame.castShadow = true; bedFrame.receiveShadow = true; Game.scene.add(bedFrame);
+            // Mattress
+            const mat = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.15, 2), new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.6 }));
+            mat.position.copy(bedFrame.position); mat.position.y = 0.7; mat.castShadow = true; Game.scene.add(mat);
+            // Pillow
+            const pillow = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.1, 0.3), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 }));
+            pillow.position.copy(bedFrame.position); pillow.position.y = 0.82; pillow.position.z -= 0.8; Game.scene.add(pillow);
+            // IV stand
+            const ivStand = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2, 12), new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.3, metalness: 0.8 }));
+            ivStand.position.set(bedFrame.position.x + 0.6, 1, bedFrame.position.z + 0.5);
+            ivStand.castShadow = true; Game.scene.add(ivStand);
+            const ivBag = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 12), new THREE.MeshStandardMaterial({ color: 0xaaddff, roughness: 0.2, transparent: true, opacity: 0.6 }));
+            ivBag.position.set(ivStand.position.x, 1.8, ivStand.position.z); Game.scene.add(ivBag);
+            // Bed legs (4)
+            for (let lx of [-0.4, 0.4]) {
+              for (let lz of [-1, 1]) {
+                const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.4, 8), new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8, roughness: 0.3 }));
+                leg.position.set(bedFrame.position.x + lx, 0.2, bedFrame.position.z + lz);
+                Game.scene.add(leg);
+              }
+            }
+          }
+        } else if (levelIndex === 16) {
+          // The Toy Store: shelves with toys
+          for (let s = 0; s < 3; s++) {
+            const shelf = new THREE.Mesh(new THREE.BoxGeometry(3, 2.5, 0.5), new THREE.MeshStandardMaterial({ color: 0x5a3a5a, roughness: 0.7 }));
+            shelf.position.set(room.x + (Math.random()-0.5)*(room.width-3), 1.25, room.z + (Math.random()-0.5)*(room.depth-1));
+            shelf.castShadow = true; shelf.receiveShadow = true; Game.scene.add(shelf);
+            // Toys on shelf (3 rows)
+            for (let row = 0; row < 3; row++) {
+              for (let toy = 0; toy < 5; toy++) {
+                const toyColors = [0xff4466, 0x44ff66, 0x4466ff, 0xffff44, 0xff44ff, 0x44ffff];
+                const tc = toyColors[Math.floor(Math.random()*toyColors.length)];
+                const toyItem = new THREE.Mesh(
+                  new THREE.SphereGeometry(0.15, 16, 12),
+                  new THREE.MeshStandardMaterial({ color: tc, roughness: 0.4, metalness: 0.2 })
+                );
+                toyItem.position.set(shelf.position.x - 1.2 + toy * 0.6, 0.6 + row * 0.8, shelf.position.z + 0.15);
+                toyItem.castShadow = true; Game.scene.add(toyItem);
+                // Eyes (creepy)
+                const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), new THREE.MeshStandardMaterial({ color: 0x000000 }));
+                eyeL.position.set(toyItem.position.x - 0.04, toyItem.position.y + 0.03, toyItem.position.z + 0.13); Game.scene.add(eyeL);
+                const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), new THREE.MeshStandardMaterial({ color: 0x000000 }));
+                eyeR.position.set(toyItem.position.x + 0.04, toyItem.position.y + 0.03, toyItem.position.z + 0.13); Game.scene.add(eyeR);
+              }
+            }
+          }
+        } else if (levelIndex === 17) {
+          // The Catacombs: bone walls and skulls
+          for (let bw = 0; bw < 5; bw++) {
+            // Stack of bones
+            for (let bone = 0; bone < 8; bone++) {
+              const boneMat = new THREE.MeshStandardMaterial({ color: 0xddccaa, roughness: 0.8 });
+              const boneItem = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.4 + Math.random()*0.2, 8), boneMat);
+              boneItem.position.set(
+                room.x + (Math.random()-0.5)*(room.width-1),
+                0.2 + bone * 0.25,
+                room.z + (Math.random()-0.5)*(room.depth-1)
+              );
+              boneItem.rotation.set(Math.random()*0.5, Math.random()*Math.PI*2, Math.random()*0.5);
+              boneItem.castShadow = true; Game.scene.add(boneItem);
+            }
+            // Skull
+            const skull = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 12), new THREE.MeshStandardMaterial({ color: 0xeeeedd, roughness: 0.7 }));
+            skull.position.set(room.x + (Math.random()-0.5)*(room.width-1), 2.2 + Math.random()*0.3, room.z + (Math.random()-0.5)*(room.depth-1));
+            skull.castShadow = true; Game.scene.add(skull);
+            // Eye sockets
+            const socketL = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 6), new THREE.MeshStandardMaterial({ color: 0x000000 }));
+            socketL.position.set(skull.position.x - 0.06, skull.position.y, skull.position.z + 0.14); Game.scene.add(socketL);
+            const socketR = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 6), new THREE.MeshStandardMaterial({ color: 0x000000 }));
+            socketR.position.set(skull.position.x + 0.06, skull.position.y, skull.position.z + 0.14); Game.scene.add(socketR);
+          }
+        } else if (levelIndex === 18) {
+          // The Void: floating platforms and debris
+          for (let p = 0; p < 6; p++) {
+            const platMat = new THREE.MeshStandardMaterial({ color: 0x0a0a1a, roughness: 0.9, metalness: 0.3, emissive: 0x0a0533, emissiveIntensity: 0.3 });
+            const plat = new THREE.Mesh(new THREE.BoxGeometry(2 + Math.random()*2, 0.2, 2 + Math.random()*2), platMat);
+            plat.position.set(
+              room.x + (Math.random()-0.5)*room.width*1.5,
+              0.5 + Math.random()*3,
+              room.z + (Math.random()-0.5)*room.depth*1.5
+            );
+            plat.rotation.set(Math.random()*0.3, Math.random()*Math.PI*2, Math.random()*0.3);
+            plat.castShadow = true; plat.receiveShadow = true; Game.scene.add(plat);
+            // Glowing edge
+            const edge = new THREE.Mesh(new THREE.BoxGeometry(plat.geometry.parameters.width + 0.05, 0.05, plat.geometry.parameters.depth + 0.05), new THREE.MeshStandardMaterial({ color: 0x4466ff, emissive: 0x4466ff, emissiveIntensity: 1 }));
+            edge.position.copy(plat.position); edge.rotation.copy(plat.rotation); Game.scene.add(edge);
+          }
+          // Floating debris
+          for (let d = 0; d < 10; d++) {
+            const debris = new THREE.Mesh(new THREE.BoxGeometry(0.2 + Math.random()*0.3, 0.2 + Math.random()*0.3, 0.2 + Math.random()*0.3), new THREE.MeshStandardMaterial({ color: 0x222244, roughness: 0.8 }));
+            debris.position.set(room.x + (Math.random()-0.5)*room.width*2, Math.random()*5, room.z + (Math.random()-0.5)*room.depth*2);
+            debris.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, Math.random()*Math.PI);
+            Game.scene.add(debris);
+          }
+        } else if (levelIndex === 19) {
+          // The Core: pulsating organic geometry
+          const coreMat = new THREE.MeshStandardMaterial({ color: 0x2a0a3a, roughness: 0.3, metalness: 0.7, emissive: 0xff33aa, emissiveIntensity: 0.5 });
+          // Central pulsating sphere
+          const coreSphere = new THREE.Mesh(new THREE.SphereGeometry(1.5, 32, 24), coreMat);
+          coreSphere.position.set(room.x, 2, room.z);
+          coreSphere.castShadow = true; Game.scene.add(coreSphere);
+          // Inner glow
+          const innerGlow = new THREE.Mesh(new THREE.SphereGeometry(0.8, 24, 16), new THREE.MeshStandardMaterial({ color: 0xff66aa, emissive: 0xff33aa, emissiveIntensity: 2 }));
+          innerGlow.position.copy(coreSphere.position); Game.scene.add(innerGlow);
+          // Core light
+          const coreLight = new THREE.PointLight(0xff33aa, 5, 20, 2);
+          coreLight.position.copy(coreSphere.position); Game.scene.add(coreLight);
+          // Orbiting fragments
+          for (let o = 0; o < 12; o++) {
+            const frag = new THREE.Mesh(new THREE.OctahedronGeometry(0.2 + Math.random()*0.2, 0), new THREE.MeshStandardMaterial({ color: 0x4a1a5a, roughness: 0.4, metalness: 0.6, emissive: 0xaa2266, emissiveIntensity: 0.4 }));
+            const angle = (o / 12) * Math.PI * 2;
+            frag.position.set(coreSphere.position.x + Math.cos(angle) * 2.5, coreSphere.position.y + (Math.random()-0.5) * 2, coreSphere.position.z + Math.sin(angle) * 2.5);
+            frag.castShadow = true; Game.scene.add(frag);
+          }
+          // Floor veins (glowing lines)
+          for (let v = 0; v < 6; v++) {
+            const vein = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.02, 3 + Math.random()*2), new THREE.MeshStandardMaterial({ color: 0xff33aa, emissive: 0xff33aa, emissiveIntensity: 1.5 }));
+            vein.position.set(room.x + (Math.random()-0.5)*(room.width-1), 0.02, room.z + (Math.random()-0.5)*(room.depth-1));
+            vein.rotation.y = Math.random() * Math.PI;
+            Game.scene.add(vein);
           }
         }
       }
@@ -3566,8 +3816,8 @@ const uiSystem = {
   },
 
   showVictoryScreen() {
-    document.getElementById('extractTitle').textContent = '恭喜通关全部楼层！';
-    document.getElementById('extractStats').innerHTML = '你成功逃离了后室...';
+    document.getElementById('extractTitle').textContent = '恭喜通关全部20层！';
+    document.getElementById('extractStats').innerHTML = '你直面了建筑师，做出了最终选择。后室的真相由你亲手书写。';
     document.getElementById('nextLevelBtn').textContent = '返回菜单';
     document.getElementById('nextLevelBtn').onclick = backToMenu;
     document.getElementById('extractOverlay').classList.add('show');
@@ -4311,7 +4561,7 @@ const SBM_LORE = {
       level: 0,
       title: "第一章：坠落",
       intro: "你从现实的裂缝中坠落，醒来时已身处黄色壁纸的无尽房间。一个耳塞里的声音告诉你：'欢迎加入SBM。你现在是我们的外勤探员了。'",
-      outro: "你找到了第一个撤离点。SBM指挥官K的声音响起：'干得不错，探员。但这只是开始。后室有十一层已确认区域，真相在最深处。'"
+      outro: "你找到了第一个撤离点。SBM指挥官K的声音响起：'干得不错，探员。但这只是开始。后室有二十层已确认区域，真相在最深处。'"
     },
     {
       level: 1,
@@ -4363,9 +4613,69 @@ const SBM_LORE = {
     },
     {
       level: 9,
-      title: "终章：门槛",
+      title: "第十章：门槛",
       intro: "现实与虚空的交界。编排者——曾经的探员#0000——以巨大的扭曲人形出现在走廊尽头。他不攻击你，只是注视。",
-      outro: "你做出了选择。后室的真相，由你亲手书写。"
+      outro: "你击败了编排者。但他的最后一句话让你血液凝固：'你以为我是终点？不……我只是门。门后面，是真正的造物主。'"
+    },
+    {
+      level: 10,
+      title: "第十一章：崩塌",
+      intro: "编排者的死引发了连锁反应。后室的结构开始崩塌，你在裂隙中坠落，醒来时身处一座腐朽的地铁隧道。耳塞里传来微弱的信号——是Dr.陈的声音。",
+      outro: "地铁隧道尽头是一面巨大的书架墙。Dr.陈的声音告诉你：'后室有第二层。编排者只是守门人。真正的创造者在更深处。'"
+    },
+    {
+      level: 11,
+      title: "第十二章：编年史",
+      intro: "无尽图书馆的书架上记载着每一个曾经进入后室的灵魂。你翻阅了SBM的完整档案——发现SBM的历史远比你想象的久远。",
+      outro: "你在图书馆深处发现了一本没有封面的书。翻开它，里面只写了一句话：'建筑师不创造后室。建筑师就是后室。'"
+    },
+    {
+      level: 12,
+      title: "第十三章：回声",
+      intro: "停车场的混凝土柱子之间回荡着你的脚步声——但回声比你早一步。有什么东西在模仿你，或者它就是另一个你。",
+      outro: "你在停车场的出口处看到了一面巨大的镜子。镜中的你正在微笑，但你没有在笑。镜中的你转身走向了镜面迷宫。"
+    },
+    {
+      level: 13,
+      title: "第十四章：倒影",
+      intro: "镜面迷宫中，你的倒影开始脱离你的控制。它们会出现在你没有照镜子的地方，做出你没有做过的动作。",
+      outro: "你击碎了迷宫核心的镜子。碎片中映射出的是一个完全不同的后室——那才是'原版'，而你所经历的一切只是复制品。"
+    },
+    {
+      level: 15,
+      title: "第十五章：放映",
+      intro: "废弃电影院里，银幕上播放着你的记忆——但你从未经历过这些画面。银幕上的你正在和一个你从未见过的存在对话。",
+      outro: "电影院的出口通向一条医院走廊。Dr.陈的全息投影出现：'后室会读取你的记忆，然后用它来制造新的楼层。你必须阻止它。'"
+    },
+    {
+      level: 16,
+      title: "第十六章：诊断",
+      intro: "医院的病床上躺着和你穿着一模一样衣服的人形。它们没有脸，但胸口都挂着一个SBM探员牌。",
+      outro: "你在医院地下室找到了建筑师的诊断报告：'后室是一个活的有机体。建筑师是它的大脑。编排者是它的免疫系统。你——是入侵的病毒。'"
+    },
+    {
+      level: 17,
+      title: "第十七章：游戏",
+      intro: "玩具店里的毛绒玩具开始移动。它们不是在攻击你——它们在邀请你加入一场游戏。游戏规则很简单：活下去。",
+      outro: "你打破了玩具店的游戏规则。在碎片中，你看到了通往地下墓穴的入口。墙壁上的骨骼在低语：'我们也曾打破规则。'"
+    },
+    {
+      level: 18,
+      title: "第十八章：遗骨",
+      intro: "地下墓穴由无数探员的遗骨堆砌而成。每一块骨骼都在低声讲述自己的故事——他们都是从Level 0一路走到这里的探员。",
+      outro: "你在墓穴最深处找到了一扇由纯粹黑暗构成的门。穿过它，你将进入后室楼层之间的空间——虚空。"
+    },
+    {
+      level: 19,
+      title: "第十九章：坠落",
+      intro: "虚空。没有上下，没有方向。漂浮的后室残骸从你身边掠过。你看到了所有20个楼层的横截面——它们像洋葱一样层层包裹着核心。",
+      outro: "在虚空的尽头，一个巨大的脉动光球出现了。那是后室的核心——建筑师的所在。你的耳塞最后一次响起：'探员，这是最后的路了。'"
+    },
+    {
+      level: 20,
+      title: "终章：建筑师",
+      intro: "后室的真正核心。建筑师——一个由后室本身构成的存在——以不断变化的人形出现在你面前。它的声音不是来自任何方向，而是来自你的内心。",
+      outro: "建筑师说：'我即是后室，后室即是我。编排者是我的免疫系统，试图阻止入侵者到达这里。而你，是第一个到达核心的存在。现在，做选择吧——与我融合成为新的后室，还是终结我，让后室与你一同消失。'"
     }
   ],
 
@@ -4377,7 +4687,14 @@ const SBM_LORE = {
     { id: 'log_004', level: 3, title: '紧急通讯', text: '所有探员注意。编排者不是传说。我在Level 3的电气系统中发现了人为编码的信号模式。后室是被设计的。——Dr.陈（加密频道）' },
     { id: 'log_005', level: 5, title: '探员#0000档案', text: '姓名：[已删除]。入职日期：SBM成立日。失踪日期：SBM成立后第7天。备注：第一个进入后室的人。最后通讯记录：「我看到了尽头。我需要让它继续。」' },
     { id: 'log_006', level: 7, title: '编排者日记·最终页', text: '后室的尽头是虚无。我用自己的意识填补了虚无，创造了更多楼层。SBM是我留下的求救信。我在等待一个足够强的人到达核心，杀死我——因为后室不会让我自杀。如果你读到这段话，请继续前进。' },
-    { id: 'log_007', level: 9, title: 'Dr.陈的最后录音', text: '编排者在等待终结。但他不会让你轻易做到。Threshold是他最后的防线，也是他最后的请求。杀了他，后室会崩塌。但如果你选择放过他……后室会永远存在，而你会成为新的编排者。选择权在你。' }
+    { id: 'log_007', level: 9, title: 'Dr.陈的最后录音', text: '编排者在等待终结。但他不会让你轻易做到。Threshold是他最后的防线，也是他最后的请求。杀了他，后室会崩塌。但如果你选择放过他……后室会永远存在，而你会成为新的编排者。选择权在你。' },
+    { id: 'log_008', level: 10, title: '地铁隧道勘测', text: '编排者死后，后室表层10层开始结构性崩塌。地铁隧道是连接表层与深层的通道。注意：隧道中的列车并不是交通工具。——SBM自动勘测系统' },
+    { id: 'log_009', level: 12, title: '关于"建筑师"', text: '建筑师不是一个实体。它是后室本身的意识。编排者是它分离出来执行管理的子程序。当编排者被消灭，建筑师的意识开始苏醒。——Dr.陈（深层频道）' },
+    { id: 'log_010', level: 14, title: '镜面悖论', text: '后室存在"原版"和"镜像"两个版本。你所经历的一切都是镜像。原版后室在镜子另一侧。如果镜面被完全打破，两个版本会合并——后果未知。——SBM理论物理组' },
+    { id: 'log_011', level: 16, title: '病毒假说', text: '探员（即人类）对后室来说是外来入侵体。编排者相当于免疫系统。建筑师的诊断报告将我们定性为"病毒"。这不是侮辱——这是生物学事实。——Dr.陈' },
+    { id: 'log_012', level: 18, title: '墓穴铭文', text: '我们不是第一批到达这里的探员。我们也不会是最后一批。每一块骨骼都是一个未完成的故事。如果你读到这里，请替我们走完最后一段路。——无名探员遗骨' },
+    { id: 'log_013', level: 19, title: '虚空导航', text: '虚空是后室楼层之间的间隙。没有物理定律，没有方向感。唯一的导航方式是跟随建筑师的脉动。它在召唤你——不是因为欢迎，而是因为饥饿。——SBM虚空研究组' },
+    { id: 'log_014', level: 20, title: '建筑师的独白', text: '我不是被创造的。我从虚无中自发生成。后室是我的身体，编排者是我的手指，SBM是我的梦境。你们是闯入我梦境的幽灵。我不恨你们。但你们必须做出选择：与我融合，或者让我沉睡。没有第三条路。——建筑师' }
   ],
 
   // SBM NPC 对话
@@ -4410,7 +4727,31 @@ const SBM_LORE = {
         '我曾经也想逃出去。后来我发现——没有外面。后室就是全部。',
         '如果你杀死我，这一切都会消失。包括你自己。',
         '如果你放过我……你会成为我。你会理解为什么我需要有人来终结这一切。',
-        '做选择吧，探员。我已经等了太久太久。'
+        '做选择吧，探员。我已经等了太久太久。',
+        '你以为我是终点？不……我只是门。门后面，是真正的造物主。'
+      ]
+    },
+    the_architect: {
+      name: '建筑师',
+      dialogues: [
+        '你终于来了。我等了亿万年。编排者没能阻止你。',
+        '不要害怕。我即是后室，后室即是我。你不是在和我说话——你是在和整座建筑说话。',
+        '编排者是我的免疫系统。SBM是我的梦呓。你们是从现实世界漏进来的幽灵。',
+        '我并不恨你们。但你们的存在让我无法沉睡。一个无法沉睡的后室会不断扩张，吞噬更多现实。',
+        '你有两个选择。与我融合，成为后室的一部分——你将获得永恒，但失去自我。或者终结我，让后室与你一同消失——你将回到现实，但后室中的所有灵魂都将解脱。',
+        '做出选择吧，探员。这一次没有第三条路。',
+        '……你说什么？你找到了第三种方法？不可能……等等，那个圣物……那是我的第一块骨骼。如果你将它归还给我……'
+      ]
+    },
+    dr_chen_deep: {
+      name: 'Dr.陈（深层频道）',
+      dialogues: [
+        '听得到吗？表层信号已经断了。我在用深层频道联系你。',
+        '编排者不是终点。它只是建筑师的免疫细胞。真正的核心在更深处。',
+        '后室有20层。表层10层是编排者构建的。深层10层是建筑师本身的身体。',
+        '建筑师的诊断报告把人类定性为"病毒"。从后室的角度看，我们确实是入侵者。',
+        '如果你到达核心……你必须做出选择。但请记住，每个选择都有代价。',
+        '如果你有圣物……不要急着用。等到建筑师面前再决定。那可能是唯一的第三条路。'
       ]
     }
   },
@@ -4528,7 +4869,7 @@ const EasterEggs = {
     // 10. 多重结局触发
     true_ending: {
       name: '第三选择',
-      desc: '在最终BOSS战时，编排者会给你两个选择：杀死他或放过他。但如果你的背包中有"圣物"且SAN值满，会出现第三个选项：将圣物交给编排者。他会用它终结自己，同时保住后室不崩塌——你成为了新的SBM指挥官。',
+      desc: '在最终核心面对建筑师时，它给你两个选择：与它融合或终结它。但如果你的背包中有"圣物"且SAN值满，会出现第三个选项：将圣物——建筑师的第一块骨骼——归还给它。建筑师将获得永恒的安眠，后室不会崩塌也不会被吞噬，而你成为新的SBM指挥官，守护两个世界的平衡。',
       hint: '完美的精神状态+最神圣的遗物=超越二元的选择。',
       reward: { coins: 1000, exp: 500 },
       trigger: 'final_choice_with_relic'
@@ -4546,7 +4887,7 @@ const EasterEggs = {
     // 12. 开发者留言墙
     dev_messages: {
       name: '墙后的低语',
-      desc: '在Level 9 Threshold的最终走廊墙壁上，用紫外线灯（手电筒+特定角度）照射可以看到隐藏文字：「感谢你玩到这里。这不仅仅是一个游戏。这是我们对后室文化的致敬，对每一个noclip者的祝福。无论你在哪个现实，愿你找到你的出口。——Dev Team 2026」',
+      desc: '在Level 19 The Core的最终走廊墙壁上，用紫外线灯（手电筒+特定角度）照射可以看到隐藏文字：「感谢你走过全部20层。这不仅仅是一个游戏。这是我们对后室文化的致敬，对每一个noclip者的祝福。无论你在哪个现实，愿你找到你的出口。——Dev Team 2026」',
       hint: '最终的道路上，光照的角度很重要。',
       reward: { coins: 200, exp: 100 },
       trigger: 'flashlight_final_corridor'
